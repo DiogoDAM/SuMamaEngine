@@ -1,19 +1,32 @@
 using Microsoft.Xna.Framework;
-
-
-namespace SuMamaLib.Inputs.Mouse
-{
 using Microsoft.Xna.Framework.Input;
 
-	public class MouseManager
+namespace SuMamaLib
+{
+	public sealed class MouseManager
 	{
-		private MouseState _prev = Mouse.GetState();
-		private MouseState _curr = Mouse.GetState();
+		private MouseState _prev;
+		private MouseState _curr;
 
-		public int WheelValue { get { return _curr.ScrollWheelValue / 120; } }
-		public Vector2 Position { get { return _curr.Position.ToVector2(); } }
+		public Vector2 GlobalPosition { get { 
+			if(_camera != null)
+			{
+				return Vector2.Transform(_curr.Position.ToVector2(), Matrix.Invert(_camera.GetMatrix())); 
+			}
+			else
+			{
+			    return _curr.Position.ToVector2();
+			}
+		} }
 
-		public MouseManager() {}
+		public float WheelValue { get { return _curr.ScrollWheelValue/120; } }
+		private Camera _camera;
+
+		public MouseManager()
+		{
+			_prev = Mouse.GetState();
+			_curr = Mouse.GetState();
+		}
 
 		public void Update()
 		{
@@ -21,70 +34,85 @@ using Microsoft.Xna.Framework.Input;
 			_curr = Mouse.GetState();
 		}
 
-		public bool WasMoved()
+		public void SetCamera(Camera cam)
 		{
-			return _prev.Position - _curr.Position != new Point(0,0);
+			_camera = cam;
 		}
 
-		public bool LmbIsPressed()
+		public bool WheelWasMoved()
 		{
-			return _curr.LeftButton == ButtonState.Pressed;
+			return _curr.ScrollWheelValue - _prev.ScrollWheelValue != 0;
 		}
 
-		public bool LmbIsReleased()
+		// -1 -> down
+		// 1 -> up
+		public int WheelDirectionMovement()
 		{
-			return _curr.LeftButton == ButtonState.Released;
+			return _curr.ScrollWheelValue/120 - _prev.ScrollWheelValue/120;
 		}
 
-		public bool LmbWasPressed()
+		public bool ButtonIsPressed(int button)
 		{
-			return _curr.LeftButton == ButtonState.Pressed && _prev.LeftButton == ButtonState.Released;
+			 switch(button)
+			{
+				case 0: return ButtonIsPressed(_curr.LeftButton);
+				case 1: return ButtonIsPressed(_curr.RightButton);
+				case 2: return ButtonIsPressed(_curr.MiddleButton);
+				default: throw new System.Exception($"The value not correspond for any mouse button ({button})");
+			}
 		}
 
-		public bool LmbWasReleased()
+		public bool ButtonIsReleased(int button)
 		{
-			return _curr.LeftButton == ButtonState.Released && _prev.LeftButton == ButtonState.Pressed;
+			 switch(button)
+			{
+				case 0: return ButtonIsReleased(_curr.LeftButton);
+				case 1: return ButtonIsReleased(_curr.RightButton);
+				case 2: return ButtonIsReleased(_curr.MiddleButton);
+				default: throw new System.Exception($"The value not correspond for any mouse button ({button})");
+			}
 		}
 
-		public bool RmbIsPressed()
+		public bool ButtonWasPressed(int button)
 		{
-			return _curr.RightButton == ButtonState.Pressed;
+			 switch(button)
+			{
+				case 0: return ButtonWasPressed(_curr.LeftButton, _prev.LeftButton);
+				case 1: return ButtonWasPressed(_curr.RightButton, _prev.RightButton);
+				case 2: return ButtonWasPressed(_curr.MiddleButton, _prev.MiddleButton);
+				default: throw new System.Exception($"The value not correspond for any mouse button ({button})");
+			}
 		}
 
-		public bool RmbIsReleased()
+		public bool ButtonWasReleased(int button)
 		{
-			return _curr.RightButton == ButtonState.Released;
+			 switch(button)
+			{
+				case 0: return ButtonWasReleased(_curr.LeftButton, _prev.LeftButton);
+				case 1: return ButtonWasReleased(_curr.RightButton, _prev.RightButton);
+				case 2: return ButtonWasReleased(_curr.MiddleButton, _prev.MiddleButton);
+				default: throw new System.Exception($"The value not correspond for any mouse button ({button})");
+			}
 		}
 
-		public bool RmbWasPressed()
+		private bool ButtonIsPressed(ButtonState state)
 		{
-			return _curr.RightButton == ButtonState.Pressed && _prev.RightButton == ButtonState.Released;
+			return state == ButtonState.Pressed;
 		}
 
-		public bool RmbWasReleased()
+		private bool ButtonIsReleased(ButtonState state)
 		{
-			return _curr.RightButton == ButtonState.Released && _prev.RightButton == ButtonState.Pressed;
+			return state == ButtonState.Released;
 		}
 
-		public bool MmbIsPressed()
+		private bool ButtonWasPressed(ButtonState currState, ButtonState prevState)
 		{
-			return _curr.MiddleButton == ButtonState.Pressed;
+			return currState == ButtonState.Pressed && prevState == ButtonState.Released;
 		}
 
-		public bool MmbIsReleased()
+		private bool ButtonWasReleased(ButtonState currState, ButtonState prevState)
 		{
-			return _curr.MiddleButton == ButtonState.Released;
-		}
-
-		public bool MmbWasPressed()
-		{
-			return _curr.MiddleButton == ButtonState.Pressed && _prev.MiddleButton == ButtonState.Released;
-		}
-
-		public bool MmbWasReleased()
-		{
-			return _curr.MiddleButton == ButtonState.Released && _prev.MiddleButton == ButtonState.Pressed;
+			return currState == ButtonState.Released && prevState == ButtonState.Pressed;
 		}
 	}
 }
-
