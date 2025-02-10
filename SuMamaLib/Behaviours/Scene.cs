@@ -7,14 +7,16 @@ namespace SuMamaLib
 {
 	public abstract class Scene : IDisposableObject
 	{
-		protected Dictionary<string, EntityManager> _layers;
+		protected Dictionary<string, ObjectManager> _layers;
 		protected Camera _camera;
+
+		public string Id;
 
 		public bool Disposed { get; protected set; }
 
 		public Scene()
 		{
-			_layers = new Dictionary<string, EntityManager>();
+			_layers = new Dictionary<string, ObjectManager>();
 			Disposed = false;
 		}
 
@@ -22,12 +24,13 @@ namespace SuMamaLib
 		{
 			foreach(string layer in layers)
 			{
-				_layers.Add(layer, new EntityManager(layer, this));
+				_layers.Add(layer, new ObjectManager(layer, this));
 			}
 		}
 
 		public virtual void Start()
 		{
+			if(Disposed) return;
 			foreach(var layer in _layers)
 			{
 				layer.Value.Start();
@@ -36,6 +39,7 @@ namespace SuMamaLib
 
 		public virtual void Update()
 		{
+			if(Disposed) return;
 			foreach(var layer in _layers)
 			{
 				layer.Value.Update();
@@ -44,35 +48,58 @@ namespace SuMamaLib
 
 		public virtual void Draw()
 		{
+			if(Disposed) return;
 			foreach(var layer in _layers)
 			{
 				layer.Value.Draw();
 			}
 		}
 
-		public void AddEntity(string layer, Entity e)
+		public virtual void DrawUi()
+		{
+			if(Disposed) return;
+		}
+
+		public virtual void Enter()
+		{
+			if(Disposed) return;
+			Start();
+		}
+
+		public virtual void Exit()
+		{
+			if(Disposed) return;
+		}
+
+		public void AddObject(string layer, GameObject e)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.AddEnttiy() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.AddEntity() entity is null");
+			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
 			_layers[layer].Add(e);
 		}
 
-		public void AddEntity(Entity e)
+		public void AddObject(GameObject e)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.AddEntity() entity is null");
+			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
 			_layers[e.Layer].Add(e);
 		}
 
-		public void RemoveEntity(string layer, Entity e)
+		public void RemoveObject(string layer, GameObject e)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.RemoveEnttiy() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.RemoveEntity() entity is null");
+			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
 			_layers[layer].Remove(e);
 		}
 
-		public bool ContainsEntity(Entity e)
+		public void RemoveObject(GameObject e)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.ContainsEntity() entity is null");
+			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
+			_layers[e.Layer].Remove(e);
+		}
+
+		public bool ContainsObject(GameObject e)
+		{
+			if(e == null) throw new ArgumentNullException("Scene.ContainsObject() GameObject is null");
 			foreach(var layer in _layers)
 			{
 				if(layer.Value.Contains(e)) return true;
@@ -81,31 +108,36 @@ namespace SuMamaLib
 			return false;
 		}
 
-		public bool ContainsEntity(string layer, Entity e)
+		public bool ContainsObject(string layer, GameObject e)
 		{
-			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.AddEnttiy() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.AddEntity() entity is null");
+			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.ContainsObject() layer is null or empty");
+			if(e == null) throw new ArgumentNullException("Scene.ContainsObject() GameObject is null");
 
 			return _layers[layer].Contains(e);
 		}
 
-		public Entity FindEntity(Entity e)
+		public GameObject FindObject(GameObject e)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.FindEntity() entity is null");
+			if(e == null) throw new ArgumentNullException("Scene.FindObject() GameObject is null");
 
 			foreach(var layer in _layers)
 			{
-				Entity en = layer.Value.Find(e);
+				GameObject en = layer.Value.Find(e);
 				if(en != null) return en;
 			}
 
 			return null;
 		}
 
-		public Entity FindEntity(string layer, Entity e)
+		public GameObject FindObject(string layer, GameObject e)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.FindEntity() entity is null");	
+			if(e == null) throw new ArgumentNullException("Scene.FindObject() GameObject is null");	
 			return _layers[layer].Find(e);
+		}
+
+		public void ClearObjects()
+		{
+			_layers.Clear();
 		}
 
 		public Camera GetCamera()
@@ -132,6 +164,7 @@ namespace SuMamaLib
 		protected virtual void Dispose(bool dispose)
 		{
 			if(dispose && !Disposed) return;
+			_layers = null;
 		}
 	}
 }
