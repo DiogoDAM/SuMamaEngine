@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SuMamaLib
 {
@@ -12,9 +13,12 @@ namespace SuMamaLib
 		public Vector2 Anchor;
 		public float Depth;
 		public int Width, Height;
+		public Color Color;
+		public SpriteEffects Flip;
 
 		public string SceneId;
 		public string Layer;
+		public string Id;
 
 		public GameObject()
 		{
@@ -22,6 +26,8 @@ namespace SuMamaLib
 			Transform = new Transform(Vector2.Zero);
 			Anchor = Vector2.One;
 			Depth = 0f;
+			Color = Color.White;
+			Flip = SpriteEffects.None;
 		}
 
 		public virtual void Start()

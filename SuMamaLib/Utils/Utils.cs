@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace SuMamaLib
 {
-	public static class Utils
+	public static class Util
 	{
 		public static Vector2 CarToIsoScreen(int mapx, int mapy, int tileWidth, int tileHeight)
 		{

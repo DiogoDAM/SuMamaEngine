@@ -12,7 +12,7 @@ namespace SuMamaLib
 
 		public Vector2 GlobalPosition
 		{
-			get { return (Parent != null) ? Position + Parent.Position : Position ; }
+			get { return (Parent != null) ? Position + Parent.GlobalPosition : Position ; }
 		}
 
 		public Transform(Vector2 pos)

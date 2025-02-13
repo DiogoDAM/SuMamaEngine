@@ -21,6 +21,14 @@ namespace SuMamaLib
 			Flip = SpriteEffects.None;
 		}
 
+		public Sprite(Texture2D texture, int x, int y, int w, int h)
+		{
+			SetTexture(texture);
+			SetBounds(x, y, w, h);
+			Color = Color.White;
+			Flip = SpriteEffects.None;
+		}
+
 		public Sprite(Texture2D texture, Rectangle bounds)
 		{
 			SetTexture(texture);

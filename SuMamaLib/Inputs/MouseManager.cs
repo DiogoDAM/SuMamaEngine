@@ -19,6 +19,8 @@ namespace SuMamaLib
 			}
 		} }
 
+		public Vector2 Position { get { return _curr.Position.ToVector2(); } }
+
 		public float WheelValue { get { return _curr.ScrollWheelValue/120; } }
 		private Camera _camera;
 
