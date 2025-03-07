@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace SuMamaLib
 {
 	public interface IUiLayout
 	{
-		public void ProcessLayout(List<UiComponent> components);
+		public Vector2 ComponentsMargin { get; set; }
+
+		public void ProcessLayout(IEnumerable<UiComponent> components);
 	}
 }

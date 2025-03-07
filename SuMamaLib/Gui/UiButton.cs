@@ -4,15 +4,17 @@ using System;
 
 namespace SuMamaLib
 {
-	public class UiSimpleButton : UiComponent, IClickable, IHoverable
+	public class UiButton : UiComponent, IClickable, IHoverable
 	{
+		public Sprite Sprite { get; protected set; }
+
         public event Action StartClicking;
         public event Action Clicking;
         public event Action Clicked;
         public event Action StartHovering;
         public event Action Hovering;
         public event Action Hovered;
-		public event Action OutHovered;
+		public event Action OutHovering;
 
         protected bool _hovering;
 
@@ -21,18 +23,30 @@ namespace SuMamaLib
 		public Color BorderColor { get; private set; }
 		public Vector2 BorderOffset;
 
-		public UiSimpleButton(Transform trans, int w, int h, Color color): base(trans)
+		public UiButton(Transform trans, int w, int h, Sprite sprite): base(trans)
 		{
+			Sprite = sprite;
 			Width = w;
 			Height = h;
-			Color = color;
 		}
 
-		public UiSimpleButton(int w, int h, Color color): base()
+		public UiButton(int w, int h, Sprite sprite): base()
+		{
+			Sprite = sprite;
+			Width = w;
+			Height = h;
+		}
+
+		public UiButton(Transform trans, int w, int h): base(trans)
 		{
 			Width = w;
 			Height = h;
-			Color = color;
+		}
+
+		public UiButton(int w, int h): base()
+		{
+			Width = w;
+			Height = h;
 		}
 
 		public void SetBorder(int thickness, Color color)
@@ -66,15 +80,15 @@ namespace SuMamaLib
 		{
 			if(!Float)
 			{
-				Drawer.DrawFillRectangle(GlobalPosition, Width, Height, Color);
+				Globals.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 				if(_borderOn)
 				{
-					Drawer.DrawLineRectangle(GlobalPosition + BorderOffset, Width, Height, BorderColor, BorderThickness);
+					Drawer.DrawLineRectangle(Transform.GlobalPosition + BorderOffset, Width, Height, BorderColor, BorderThickness);
 				}
 			}
 			else
 			{
-				Drawer.DrawFillRectangle(Position, Width, Height, Color);
+				Globals.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 				if(_borderOn)
 				{
 					Drawer.DrawLineRectangle(Position + BorderOffset, Width, Height, BorderColor, BorderThickness);
@@ -90,7 +104,7 @@ namespace SuMamaLib
 
 			if(!Bounds.Intersects(new Rectangle(Input.Mouse.Position.ToPoint(), new Point(1,1))))
 			{
-				OutHovered?.Invoke();
+				OutHovering?.Invoke();
 			}
 			else
 			{
@@ -131,5 +145,28 @@ namespace SuMamaLib
 			}
 
         }
+
+		protected override void Dispose(bool disposable)
+		{
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					StartClicking = null;
+					Clicking = null;
+					Clicked = null;
+					StartHovering = null;
+					Hovering = null;
+					Hovered = null;
+					OutHovering = null;
+
+					Sprite.Dispose();
+
+					_children.Clear();
+
+					Disposed = true;
+				}
+			}
+		}
     }
 }

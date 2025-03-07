@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace SuMamaLib
 {
 	// The Base of all Objects in game
-	public class GameObject : IDisposableObject
+	public class GameObject : IDisposable, IPrototype
 	{
         public bool Disposed { get; protected set; }
 
@@ -22,7 +22,6 @@ namespace SuMamaLib
 
 		public GameObject()
 		{
-			Disposed = false;
 			Transform = new Transform(Vector2.Zero);
 			Anchor = Vector2.One;
 			Depth = 0f;
@@ -73,5 +72,18 @@ namespace SuMamaLib
 		{
 			if(!dispose && Disposed) return;
 		}
-	}
+
+        public virtual IPrototype ShallowClone()
+        {
+			return (GameObject) MemberwiseClone();
+        }
+
+        public virtual IPrototype DeepClone()
+        {
+			GameObject obj = (GameObject) MemberwiseClone();
+			obj.Transform = Transform;
+
+			return obj;
+        }
+    }
 }

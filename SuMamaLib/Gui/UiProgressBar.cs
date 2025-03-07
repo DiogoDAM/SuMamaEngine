@@ -2,33 +2,33 @@ using Microsoft.Xna.Framework;
 
 namespace SuMamaLib
 {
-	public class UiSimpleProgressBar : UiComponent
+	public class UiProgressBar : UiComponent
 	{
-		public Color BarColor; 
 		public float StartValue;
 		public float EndValue;
 		public float CurrentValue;
 		public float StepValue;
 		public bool IsActive;
 
-		public UiSimpleProgressBar(int w, int h, Color color, Color barColor) :base()
+		public Sprite BackgroundSprite;
+		public Sprite BarSprite;
+
+		public UiProgressBar(int w, int h, Color color) :base()
 		{
 			Width = w;
 			Height = h;
 			Color = color;
-			BarColor = barColor;
 			StartValue = 0f;
 			CurrentValue = 0f;
 			StepValue = 0.1f;
 			EndValue = 100f;
 		}
 
-		public UiSimpleProgressBar(Transform trans, int w, int h, Color color, Color barColor): base(trans)
+		public UiProgressBar(Transform trans, int w, int h, Color color): base(trans)
 		{
 			Width = w;
 			Height = h;
 			Color = color;
-			BarColor = barColor;
 			StartValue = 0f;
 			CurrentValue = 0f;
 			StepValue = 0.1f;
@@ -71,8 +71,10 @@ namespace SuMamaLib
 				if(CurrentValue < EndValue)
 				{
 					CurrentValue += StepValue;
+					BarSprite.Width = (int)(CurrentValue * Width / EndValue);
 				}
 			}
+
 
 			base.Update();
 		}
@@ -81,13 +83,13 @@ namespace SuMamaLib
 		{
 			if(!Float)
 			{
-				Drawer.DrawFillRectangle(GlobalPosition, Width, Height, Color);
-				Drawer.DrawFillRectangle(GlobalPosition, (int)(CurrentValue * Width / EndValue), Height, BarColor);
+				Globals.SpriteBatch.Draw(BackgroundSprite.Texture, GlobalPosition, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Globals.SpriteBatch.Draw(BarSprite.Texture, GlobalPosition, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 			else
 			{
-				Drawer.DrawFillRectangle(Position, Width, Height, Color);
-				Drawer.DrawFillRectangle(Position, (int)(CurrentValue * Width / EndValue), Height, BarColor);
+				Globals.SpriteBatch.Draw(BackgroundSprite.Texture, Position, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Globals.SpriteBatch.Draw(BarSprite.Texture, Position, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 
 			base.Draw();

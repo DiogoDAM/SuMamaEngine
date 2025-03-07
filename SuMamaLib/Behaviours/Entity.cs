@@ -75,5 +75,17 @@ namespace SuMamaLib
 				action(child);
 			}
 		}
+
+		protected override void Dispose(bool disposable)
+		{
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					_children.Clear();
+					Disposed = true;
+				}
+			}
+		}
     }
 }

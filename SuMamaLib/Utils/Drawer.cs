@@ -7,10 +7,12 @@ namespace SuMamaLib
 	public static class Drawer
 	{
 		private static Texture2D _pixelTexture;
+		private static GraphicsDevice _graphics;
 
 		public static void Initialize(GraphicsDevice graphics)
 		{
 			_pixelTexture = new Texture2D(graphics, 1, 1);
+			_graphics = graphics;
 			_pixelTexture.SetData<Color>(new Color[] {Color.White});
 		}
 
@@ -58,6 +60,24 @@ namespace SuMamaLib
 			Globals.SpriteBatch.Draw(_pixelTexture, pos, null, color, rot, Vector2.Zero, new Vector2(w,h), SpriteEffects.None, depth);
 		}
 
+		public static Texture2D CreateFillRectangle(int w, int h, Color color, float depth=1f)
+		{
+			Texture2D texRect = new Texture2D(_graphics, w, h);
+			Color[] data = new Color[w * h];
+
+			for(int y=0; y<h; y++)
+			{
+				for(int x=0; x<w; x++)
+				{
+					data[y * w + x] = color;
+				}
+			}
+
+			texRect.SetData(data);
+
+			return texRect;
+		}
+
 		public static void DrawFillRectangle(Rectangle rect, Color color, float rot=0f, float depth=1f)
 		{
 			Globals.SpriteBatch.Draw(_pixelTexture, rect, null, color, rot, Vector2.Zero, SpriteEffects.None, depth);
@@ -94,6 +114,50 @@ namespace SuMamaLib
 
 				DrawLine(start, end, color, thicknes, depth);
 			}
+		}
+
+		public static Texture2D CreateFillCircle(int radius, Color color, float depth=1)
+		{
+			Texture2D texCircle = new Texture2D(_graphics, radius * 2, radius * 2);
+			Color[] data = new Color[radius * 2 * radius * 2];
+
+			for(int y=0; y<radius * 2; y++)
+			{
+				for(int x=0; x<radius * 2; x++)
+				{
+					int dx = x - radius;
+					int dy = y - radius;
+
+					if(dx * dx + dy * dy <= radius * radius) data[x + y * radius * 2] = Color.White;
+					else data[x + y * radius * 2] = Color.Transparent;
+				}
+			}
+
+			texCircle.SetData(data);
+
+			return texCircle;
+		}
+
+		public static void DrawFillCircle(Vector2 pos, int radius, Color color, float depth=1)
+		{
+			Texture2D texCircle = new Texture2D(_graphics, radius * 2, radius * 2);
+			Color[] data = new Color[radius * 2 * radius * 2];
+
+			for(int y=0; y<radius * 2; y++)
+			{
+				for(int x=0; x<radius * 2; x++)
+				{
+					int dx = x - radius;
+					int dy = y - radius;
+
+					if(dx * dx + dy * dy <= radius * radius) data[x + y * radius * 2] = Color.White;
+					else data[x + y * radius * 2] = Color.Transparent;
+				}
+			}
+
+			texCircle.SetData(data);
+
+			Globals.SpriteBatch.Draw(texCircle, pos, color);
 		}
 	}
 }

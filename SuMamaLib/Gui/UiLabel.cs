@@ -4,28 +4,51 @@ namespace SuMamaLib
 {
 	public class UiLabel : UiComponent
 	{
-		public Font Font { get { return SpriteText.Font; } set { SpriteText.SetFont(value); } }
 		public SpriteText SpriteText { get; protected set; }
 		public string Text { get { return SpriteText.Text; } set { SpriteText.SetText(value); } }
+		public Font Font { get { return SpriteText.Font; } set { SpriteText.SetFont(value); } }
+		public Vector2 Spacing;
+		public int MaxLetterPerLine = 20;
 
-		public UiLabel(Transform trans, Font font, string text) : base()
+		public UiLabel(Font font, string text) : base()
 		{
-			Font = font;
-			Text = text;
-			Transform = trans;
+			SpriteText = new SpriteText(font, text);
 		}
 
 		public UiLabel(Transform trans, Font font, string text, Color color) : base()
 		{
-			Font = font;
-			Text = text;
+			SpriteText = new SpriteText(font, text);
 			Transform = trans;
 			Color = color;
 		}
 
+		public void SetHalignToLeft()
+		{
+			Spacing = new Vector2(0, 0);
+		}
+
+		public void SetHalignToCenter()
+		{
+			int aux = SpriteText.Text.Length >= MaxLetterPerLine ? MaxLetterPerLine : SpriteText.Text.Length;
+			Spacing = new Vector2(aux*0.5f * SpriteText.Font.Size, 0);
+		}
+
+		public void SetHalignToRight()
+		{
+			int aux = SpriteText.Text.Length >= MaxLetterPerLine ? MaxLetterPerLine : SpriteText.Text.Length;
+			Spacing = new Vector2(aux * SpriteText.Font.Size, 0);
+		}
+
 		public override void Draw()
 		{
-			Globals.SpriteBatch.DrawString(Font.SpriteFont, Text, Transform.GlobalPosition, Color);
+			if(!Float)
+			{
+				Globals.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, GlobalPosition, Color, Transform.Rotation, Spacing, Transform.Scale, SpriteText.Flip, 1f);
+			}
+			else
+			{
+				Globals.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, Position, Color);
+			}
 
 			base.Draw();
 			DrawProcess();

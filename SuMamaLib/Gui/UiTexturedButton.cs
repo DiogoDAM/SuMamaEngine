@@ -78,10 +78,21 @@ namespace SuMamaLib
 
 		public override void Draw()
 		{
-			Globals.SpriteBatch.Draw(Sprite.Texture, Transform.GlobalPosition, Sprite.Bounds, Color);
-			if(_borderOn)
+			if(!Float)
 			{
-				Drawer.DrawLineRectangle(Transform.GlobalPosition + BorderOffset, Width, Height, BorderColor, BorderThickness);
+				Globals.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				if(_borderOn)
+				{
+					Drawer.DrawLineRectangle(Transform.GlobalPosition + BorderOffset, Width, Height, BorderColor, BorderThickness);
+				}
+			}
+			else
+			{
+				Globals.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				if(_borderOn)
+				{
+					Drawer.DrawLineRectangle(Position + BorderOffset, Width, Height, BorderColor, BorderThickness);
+				}
 			}
 			base.Draw();
 			DrawProcess();

@@ -156,14 +156,36 @@ namespace SuMamaLib
 		public void InstantiateObject(GameObject obj)
 		{
 			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
+			_currentScene.AddObject((GameObject)obj.DeepClone());
+		}
+
+		public void InstantiateObject(GameObject obj, Transform trans)
+		{
+			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
+			obj.Transform = trans;
+			_currentScene.AddObject((GameObject)obj.DeepClone());
+		}
+
+		public void SpawnObject(GameObject obj)
+		{
+			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
 			_currentScene.AddObject(obj);
 		}
 
-		public void InstantiateObject(GameObject obj, Transform transParent)
+		public void SpawnObject(GameObject obj, Transform transParent)
 		{
 			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
-			obj.Transform.Parent = transParent;
+			obj.Transform = transParent;
 			_currentScene.AddObject(obj);
+		}
+
+		public void RemoveObject(GameObject obj)
+		{
+			if(obj == null) throw new ArgumentNullException("RemoveObject() obj is null");
+			if(_currentScene.ContainsObject(obj))
+			{
+				_currentScene.RemoveObject(obj);
+			}
 		}
 
 		public void DestroyObject(GameObject obj)
@@ -173,6 +195,8 @@ namespace SuMamaLib
 			{
 				_currentScene.RemoveObject(obj);
 			}
+
+			obj.Dispose();
 		}
 
 	}

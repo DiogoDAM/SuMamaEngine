@@ -8,6 +8,6 @@ namespace SuMamaLib
 		public event Action StartHovering;
 		public event Action Hovering;
 		public event Action Hovered;
-		public event Action OutHovered;
+		public event Action OutHovering;
 	}
 }

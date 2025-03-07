@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SuMamaLib
 {
-	public abstract class Scene : IDisposableObject
+	public abstract class Scene : IDisposable
 	{
 		protected Dictionary<string, ObjectManager> _layers;
 		protected Camera _camera;
@@ -161,10 +161,17 @@ namespace SuMamaLib
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool dispose)
+		protected virtual void Dispose(bool disposable)
 		{
-			if(dispose && !Disposed) return;
-			_layers = null;
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					_layers.Clear();
+					_camera.Dispose();
+					Disposed = true;
+				}
+			}
 		}
 	}
 }

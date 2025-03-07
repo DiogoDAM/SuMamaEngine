@@ -6,7 +6,7 @@ namespace SuMamaLib
 	public sealed class UiGridLayout : IUiLayout
 	{
 		public int Width, Height;
-		public Vector2 ComponentsMargin;
+		public Vector2 ComponentsMargin { get; set; }
 		private UiComponent _component;
 
 		public UiGridLayout(UiComponent comp, int w, int h, Vector2 margin)
@@ -24,7 +24,7 @@ namespace SuMamaLib
 			Height = h;
 		}
 
-		public void ProcessLayout(List<UiComponent> components)
+		public void ProcessLayout(IEnumerable<UiComponent> components)
 		{
 			int countw = 0;
 			int counth = 0;

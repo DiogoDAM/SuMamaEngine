@@ -89,7 +89,7 @@ namespace SuMamaLib
 						int tile = data[row * width + column];
 						if(tile != 0)
 						{
-							Vector2 tilePos = Util.CarToIsoScreen(column, row, TileWidth, TileHeight);
+							Vector2 tilePos = Utilities.CarToIsoScreen(column, row, TileWidth, TileHeight);
 							Globals.SpriteBatch.Draw(Sprite.Texture,
 									Position.ToVector2() + tilePos,
 									Sprite.Quads[tile],

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace SuMamaLib
 {
-	public sealed class SpriteAtlas
+	public sealed class SpriteAtlas : IDisposable
 	{
 		public Texture2D Texture { get; private set; }
 		public Rectangle[] Quads { get; private set; }
@@ -16,6 +16,8 @@ namespace SuMamaLib
 		public int Height { get { return Texture.Height; } }
 		public Color Color;
 		public SpriteEffects Flip;
+
+		public bool Disposed { get; private set; }
 
 		public SpriteAtlas(Texture2D texture, Point pos, int w, int h, int quantity=0)
 		{
@@ -42,11 +44,33 @@ namespace SuMamaLib
 
 		}
 
+		~SpriteAtlas()
+		{
+			Dispose(true);
+		}
+
 		public void SetTexture(Texture2D texture)
 		{
 			if(texture == null) throw new System.ArgumentNullException("texture is null");
 			Texture = texture;
 		}
 
+		public void Dispose()
+		{
+			Dispose(true);
+			System.GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposable)
+		{
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					Texture.Dispose();
+					Disposed = true;
+				}
+			}
+		}
 	}
 }

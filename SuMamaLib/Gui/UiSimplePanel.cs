@@ -20,7 +20,14 @@ namespace SuMamaLib
 
 		public override void Draw()
 		{
-			Drawer.DrawFillRectangle(GlobalPosition, Width, Height, Color);
+			if(!Float)
+			{
+				Drawer.DrawFillRectangle(GlobalPosition, Width, Height, Color);
+			}
+			else
+			{
+				Drawer.DrawFillRectangle(Position, Width, Height, Color);
+			}
 
 			base.Draw();
 		}
