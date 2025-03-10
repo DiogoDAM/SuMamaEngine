@@ -9,12 +9,11 @@ namespace SuMamaLib
 		public Rectangle Shape { get { return new Rectangle((int)Transform.Position.X, (int)Transform.Position.Y, Width, Height); } }
 		public int Width, Height;
 
-		public RectCollider(Transform trans, int w, int h, bool isSolid=true) : base()
+		public RectCollider(Transform trans, int w, int h) : base()
 		{
 			Transform = trans;
 			Width = w;
 			Height = h;
-			IsSolid = isSolid;
 		}
 
 		public override bool CollidesWith(Collider other)
@@ -28,6 +27,12 @@ namespace SuMamaLib
 				default:
 					return false;
 			}
+		}
+
+		public override void Draw(Color color)
+		{
+			base.Draw(color);
+			Drawer.DrawLineRectangle(Shape, color, 2);
 		}
 	}
 }

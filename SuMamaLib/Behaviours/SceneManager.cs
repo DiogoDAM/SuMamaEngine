@@ -151,6 +151,16 @@ namespace SuMamaLib
 			return null;
 		}
 
+		public RectCollider CreateRectCollider(Transform trans, int w, int h)
+		{
+			return _currentScene.CreateRectCollider(trans, w, h);
+		}
+
+		public CircleCollider CreateCircleCollider(Transform trans, int radius)
+		{
+			return _currentScene.CreateCircleCollider(trans, radius);
+		}
+
 		// Methods for handle the gameObjects in current Scene
 
 		public void InstantiateObject(GameObject obj)

@@ -4,18 +4,28 @@ namespace SuMamaLib
 {
 	public struct CollisionTag
 	{
-		public List<int> Tags;
+		public List<int> OwnTags;
 		public List<int> CollisionTags;
 
 		public CollisionTag()
 		{
-			Tags = new();
+			OwnTags = new();
 			CollisionTags = new();
+		}
+
+		public bool CheckTag(int t)
+		{
+			foreach(int tag in CollisionTags)
+			{
+				if(tag == t) return true;
+			}
+
+			return false;
 		}
 
 		public bool CheckTags(Collider col)
 		{
-			foreach(int tag in col.Tags.Tags)
+			foreach(int tag in col.Tags.OwnTags)
 			{
 				if(CollisionTags.Contains(tag)) return true;
 			}

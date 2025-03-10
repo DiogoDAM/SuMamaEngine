@@ -13,22 +13,27 @@ namespace SuMamaLib
 		public Vector2 Position;
 		public int Width, Height;
 
-		private CollisionManager(int Width, int Height)
+		public CollisionManager()
+		{
+			_bvh = new();
+		}
+
+		public CollisionManager(int Width, int Height)
 		{
 			_bvh = new();
 			_grid = new(20, Width/20, Height/20);
 		}
 
-		public RectCollider CreateRectCollider(Transform trans, int w, int h, bool isSolid=true)
+		public RectCollider CreateRectCollider(Transform trans, int w, int h)
 		{
-			RectCollider col = new RectCollider(trans, w, h, isSolid);
+			RectCollider col = new RectCollider(trans, w, h);
 			_bvh.Insert(col);
 			return col;
 		}
 
-		public CircleCollider CreateCircleCollider(Transform trans, int radius, bool isSolid=true)
+		public CircleCollider CreateCircleCollider(Transform trans, int radius)
 		{
-			CircleCollider col = new CircleCollider(trans, radius, isSolid);
+			CircleCollider col = new CircleCollider(trans, radius);
 			_bvh.Insert(col);
 			return col;
 		}
@@ -59,24 +64,6 @@ namespace SuMamaLib
 			if(Disposed) return;
 			_bvh.Update();
 
-		}
-
-		public void Draw()
-		{
-			if(Disposed) return;
-			foreach(var col in _bvh.Colliders)
-			{
-				switch(col)
-				{
-					case RectCollider rect:
-						Drawer.DrawLineRectangle(rect.Shape, Color.Red);
-						break;
-					case CircleCollider circle:
-						Drawer.DrawLineCircle(circle.Center, circle.Radius, 12, Color.Red);
-						break;
-					default: break;
-				}
-			}
 		}
 
 		public void Dispose()

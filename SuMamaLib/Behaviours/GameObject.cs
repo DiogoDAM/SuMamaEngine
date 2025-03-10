@@ -44,6 +44,14 @@ namespace SuMamaLib
 			if(Disposed) return;
 		}
 
+		public virtual void OnAdd()
+		{
+		}
+
+		public virtual void OnRemoved()
+		{
+		}
+
 		// Static Methods for handle Entities in Current scene
 
 		public static void Instantiate(GameObject e)

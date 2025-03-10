@@ -8,6 +8,7 @@ namespace SuMamaLib
 	public abstract class Scene : IDisposable
 	{
 		protected Dictionary<string, ObjectManager> _layers;
+		protected CollisionManager _collisionManager;
 		protected Camera _camera;
 
 		public string Id;
@@ -18,6 +19,7 @@ namespace SuMamaLib
 		{
 			_layers = new Dictionary<string, ObjectManager>();
 			Disposed = false;
+			_collisionManager = new CollisionManager();
 		}
 
 		public void AddLayers(string[] layers)
@@ -44,6 +46,7 @@ namespace SuMamaLib
 			{
 				layer.Value.Update();
 			}
+			_collisionManager.Update();
 		}
 
 		public virtual void Draw()
@@ -75,12 +78,15 @@ namespace SuMamaLib
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.AddEnttiy() layer is null or empty");
 			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
+			e.Layer = layer;
+			e.OnAdd();
 			_layers[layer].Add(e);
 		}
 
 		public void AddObject(GameObject e)
 		{
 			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
+			e.OnAdd();
 			_layers[e.Layer].Add(e);
 		}
 
@@ -88,12 +94,14 @@ namespace SuMamaLib
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.RemoveEnttiy() layer is null or empty");
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
+			e.OnRemoved();
 			_layers[layer].Remove(e);
 		}
 
 		public void RemoveObject(GameObject e)
 		{
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
+			e.OnRemoved();
 			_layers[e.Layer].Remove(e);
 		}
 
@@ -133,6 +141,26 @@ namespace SuMamaLib
 		{
 			if(e == null) throw new ArgumentNullException("Scene.FindObject() GameObject is null");	
 			return _layers[layer].Find(e);
+		}
+
+		public List<GameObject> GetAllEntities(string layer)
+		{
+			return _layers[layer].GetAllEntities();
+		}
+
+		public T GetEntityType<T>(string layer) where T : GameObject
+		{
+			return (T)_layers[layer].GetEntityType<T>();
+		}
+
+		public RectCollider CreateRectCollider(Transform trans, int w, int h)
+		{
+			return _collisionManager.CreateRectCollider(trans, w, h);
+		}
+
+		public CircleCollider CreateCircleCollider(Transform trans, int radius)
+		{
+			return _collisionManager.CreateCircleCollider(trans, radius);
 		}
 
 		public void ClearObjects()

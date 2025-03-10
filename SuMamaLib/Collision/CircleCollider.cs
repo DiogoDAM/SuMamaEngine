@@ -11,11 +11,10 @@ namespace SuMamaLib
 
 		public int Radius;
 
-		public CircleCollider(Transform trans, int radius, bool isSolid=true) : base()
+		public CircleCollider(Transform trans, int radius) : base()
 		{
 			Transform = trans;
 			Radius = radius;
-			IsSolid = isSolid;
 		}
 
 		public override bool CollidesWith(Collider other)
@@ -29,6 +28,12 @@ namespace SuMamaLib
 				default:
 					return false;
 			}
+		}
+
+		public override void Draw(Color color)
+		{
+			base.Draw(color);
+			Drawer.DrawLineCircle(Center, Radius, 12, color, 2);
 		}
 	}
 }

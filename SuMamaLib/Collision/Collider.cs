@@ -19,7 +19,6 @@ namespace SuMamaLib
 
         public bool Disposed { get; protected set; }
 
-        public bool IsSolid;
 		public Transform Transform;
 
 		public Action<CollisionInfo> CollisionEnter;
@@ -95,10 +94,10 @@ namespace SuMamaLib
 
 			float minOverlap = Math.Min(Math.Min(leftOverlap, rightOverlap), Math.Min(topOverlap, bottomOverlap));
 
-			if(minOverlap == leftOverlap) return (CollisionSide.Left, CollisionSide.Right);
-			if(minOverlap == rightOverlap) return (CollisionSide.Right, CollisionSide.Left);
-			if(minOverlap == topOverlap) return (CollisionSide.Top, CollisionSide.Bottom);
-			if(minOverlap == bottomOverlap) return (CollisionSide.Bottom, CollisionSide.Top);
+			if(minOverlap == leftOverlap) return (CollisionSide.Right, CollisionSide.Left);
+			if(minOverlap == rightOverlap) return (CollisionSide.Left, CollisionSide.Right);
+			if(minOverlap == topOverlap) return (CollisionSide.Bottom, CollisionSide.Top);
+			if(minOverlap == bottomOverlap) return (CollisionSide.Top, CollisionSide.Bottom);
 			return (CollisionSide.None, CollisionSide.None);
 		}
 
@@ -129,6 +128,11 @@ namespace SuMamaLib
 				}
 			}
 
+		}
+
+		public virtual void Draw(Color color)
+		{
+			if(Disposed) return;
 		}
 
         public void Dispose()

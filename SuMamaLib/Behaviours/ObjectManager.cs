@@ -65,6 +65,17 @@ namespace SuMamaLib
 			return _objs.Find((it) => it.Equals(obj));
 		}
 
+		public T GetEntityType<T>() where T : GameObject
+		{
+			return (T)_objs.Find((e) => e is T);
+		}
+
+
+		public List<GameObject> GetAllEntities()
+		{
+			return _objs;
+		}
+
 		public void Clear()
 		{
 			_objs.Clear();
