@@ -7,8 +7,8 @@ namespace SuMamaEngine
 {
 	public abstract class Scene : IDisposable
 	{
-		protected Dictionary<string, ObjectManager> _layers;
-		protected CollisionManager _collisionManager;
+		protected Dictionary<string, SceneLayer> _layers;
+		protected WorldCollisor _world;
 		protected Camera _camera;
 
 		public string Id;
@@ -17,17 +17,22 @@ namespace SuMamaEngine
 
 		public Scene()
 		{
-			_layers = new Dictionary<string, ObjectManager>();
+			_layers = new Dictionary<string, SceneLayer>();
+			_world = new();
 			Disposed = false;
-			_collisionManager = new CollisionManager();
 		}
 
-		public void AddLayers(string[] layers)
+		public void CreateLayers(string[] layers)
 		{
 			foreach(string layer in layers)
 			{
-				_layers.Add(layer, new ObjectManager(layer, this));
+				_layers.Add(layer, new SceneLayer(layer, this));
 			}
+		}
+
+		public void CreateLayer(string layer)
+		{
+			_layers.Add(layer, new SceneLayer(layer, this));
 		}
 
 		public virtual void Start()
@@ -46,7 +51,7 @@ namespace SuMamaEngine
 			{
 				layer.Value.Update();
 			}
-			_collisionManager.Update();
+			_world.CheckCollisions();
 		}
 
 		public virtual void Draw()
@@ -151,16 +156,6 @@ namespace SuMamaEngine
 		public T GetEntityType<T>(string layer) where T : GameObject
 		{
 			return (T)_layers[layer].GetEntityType<T>();
-		}
-
-		public RectCollider CreateRectCollider(Transform trans, int w, int h)
-		{
-			return _collisionManager.CreateRectCollider(trans, w, h);
-		}
-
-		public CircleCollider CreateCircleCollider(Transform trans, int radius)
-		{
-			return _collisionManager.CreateCircleCollider(trans, radius);
 		}
 
 		public void ClearObjects()

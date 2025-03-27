@@ -16,18 +16,32 @@ namespace SuMamaEngine
 			Height = h;
 		}
 
-		public override bool CollidesWith(Collider other)
+		public override bool CollidesWith(Collider col)
 		{
-			switch(other)
+			switch(col)
 			{
-				case RectCollider rect:
-					return Shape.Intersects(rect.Shape);
-				case CircleCollider circle:
-					return Collider.CircleIntersectsRectangle(circle.Center, circle.Radius, Shape);
-				default:
-					return false;
+				case RectCollider rect: return CollidesWith(rect);
+				case CircleCollider circle: return CollidesWith(circle);
+				case GridCollider grid: return CollidesWith(grid);
+				default: return false;
 			}
 		}
+
+		public override bool CollidesWith(RectCollider col)
+		{
+			return Shape.Intersects(col.Shape);
+		}
+
+		public override bool CollidesWith(CircleCollider col)
+		{
+			return Collider.CircleIntersectsRectangle(col.Center, col.Radius, Shape);
+		}
+
+		public override bool CollidesWith(GridCollider col)
+		{
+			return col.CollidesWith(this);
+		}
+
 
 		public override void Draw(Color color)
 		{

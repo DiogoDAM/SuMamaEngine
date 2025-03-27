@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace SuMamaEngine
 {
-	public struct ObjectManager
+	public struct SceneLayer
 	{
 		private List<GameObject> _objs;
 		public int Count { get { return _objs.Count; } }
-		public string Layer;
+		public string Id;
 		public Scene Scene;
 
-		public ObjectManager(string layer, Scene scene)
+		public SceneLayer(string layer, Scene scene)
 		{
 			_objs = new List<GameObject>();
-			Layer = layer;
+			Id = layer;
 			Scene = scene;
 		}
 

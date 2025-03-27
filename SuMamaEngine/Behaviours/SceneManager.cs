@@ -59,7 +59,7 @@ namespace SuMamaEngine
 
 		//Methods for handle the current scene
 
-		public void SwitchScene(Scene scene)
+		public void ChangeScene(Scene scene)
 		{
 			if(scene == null) throw new ArgumentNullException("SceneManager.SwitchScene() scene is null");
 			if(_scenes.ContainsValue(scene))
@@ -70,7 +70,7 @@ namespace SuMamaEngine
 			}
 		}
 
-		public void SwitchScene(string sceneId)
+		public void ChangeScene(string sceneId)
 		{
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.SwitchScene() sceneId is empty or null");
 			if(_scenes.ContainsKey(sceneId))
@@ -88,7 +88,7 @@ namespace SuMamaEngine
 		{
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			_scenes.Add(scene.Id, scene);
-			if(_currentScene == null) SwitchScene(scene);
+			if(_currentScene == null) ChangeScene(scene);
 		}
 
 		public void AddScene(string sceneId, Scene scene)
@@ -96,7 +96,7 @@ namespace SuMamaEngine
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.AddScene() sceneId is null or Empty");
 			_scenes.Add(sceneId, scene);
-			if(_currentScene == null) SwitchScene(sceneId);
+			if(_currentScene == null) ChangeScene(sceneId);
 		}
 
 		public void RemoveScene(Scene scene)
@@ -150,17 +150,6 @@ namespace SuMamaEngine
 
 			return null;
 		}
-
-		public RectCollider CreateRectCollider(Transform trans, int w, int h)
-		{
-			return _currentScene.CreateRectCollider(trans, w, h);
-		}
-
-		public CircleCollider CreateCircleCollider(Transform trans, int radius)
-		{
-			return _currentScene.CreateCircleCollider(trans, radius);
-		}
-
 		// Methods for handle the gameObjects in current Scene
 
 		public void InstantiateObject(GameObject obj)
@@ -208,6 +197,5 @@ namespace SuMamaEngine
 
 			obj.Dispose();
 		}
-
 	}
 }

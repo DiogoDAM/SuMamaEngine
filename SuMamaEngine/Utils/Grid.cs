@@ -49,28 +49,6 @@ namespace SuMamaEngine
 			return _cells[index.Y * Width + index.X];
 		}
 
-		public void Move(int originx, int originy, int targetx, int targety)
-		{
-			if(!IndexIsValid(originx, originy)) throw new Exception("Grid.Move() the origin index is out of bound");
-			if(!IndexIsValid(targetx, targety)) throw new Exception("Grid.Move() the target index is out of bound");
-
-			T value = Get(originx, originy);
-			if(value != null)
-			{
-				Set(targetx, targety, value);
-			}
-		}
-		public void Move(Point origin, Point target)
-		{
-			if(!IndexIsValid(origin)) throw new Exception("Grid.Move() the origin index is out of bound");
-			if(!IndexIsValid(target)) throw new Exception("Grid.Move() the target index is out of bound");
-
-			T value = Get(origin.X, origin.Y);
-			if(value != null)
-			{
-				Set(target.X, target.Y, value);
-			}
-		}
 
 		public void Fill(T value)
 		{

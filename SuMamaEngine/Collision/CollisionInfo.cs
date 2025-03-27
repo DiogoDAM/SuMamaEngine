@@ -10,5 +10,6 @@ namespace SuMamaEngine
 			ColliderA = a;
 			ColliderB = b;
 		}
+
 	}
 }

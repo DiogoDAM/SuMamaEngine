@@ -1,70 +1,148 @@
 using System;
-using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace SuMamaEngine
 {
 	public sealed class CollisionManager : IDisposable
 	{
-		private Bvh _bvh;
-		private SpatialGrid _grid;
+		private static CollisionManager _instance;
+		public static CollisionManager Instance { get { if(_instance == null) _instance = new(); return _instance; } }
+
+		private WorldCollisor _static;
+		private Dictionary<string, WorldCollisor> _scenes;
+
+		public string CurrentScene;
+
+		private List<Collider> _dynamicColliders;
 
 		public bool Disposed { get; private set; }
 
-		public Vector2 Position;
-		public int Width, Height;
 
-		public CollisionManager()
+		private CollisionManager()
 		{
-			_bvh = new();
+			_static = new();
+			_scenes = new();
+			_dynamicColliders = new();
 		}
 
-		public CollisionManager(int Width, int Height)
+		public void AddScene(string scene)
 		{
-			_bvh = new();
-			_grid = new(20, Width/20, Height/20);
+			if(!_scenes.ContainsKey(scene))
+			{
+				_scenes.Add(scene, new WorldCollisor());
+			}
 		}
 
-		public RectCollider CreateRectCollider(Transform trans, int w, int h)
+		public void RemoveScene(string scene)
+		{
+			_scenes.Remove(scene);
+		}
+
+		public WorldCollisor GetWorld(string scene)
+		{
+			if(_scenes.ContainsKey(scene))
+			{
+				return _scenes[scene];
+			}
+			return null;
+		}
+
+		public RectCollider CreateStaticRectCollider(Transform trans, int w, int h, bool isDynamic=false)
 		{
 			RectCollider col = new RectCollider(trans, w, h);
-			_bvh.Insert(col);
+			_static.AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
 			return col;
 		}
 
-		public CircleCollider CreateCircleCollider(Transform trans, int radius)
+		public CircleCollider CreateStaticCircleCollider(Transform trans, int radius, bool isDynamic=false)
 		{
 			CircleCollider col = new CircleCollider(trans, radius);
-			_bvh.Insert(col);
+			_static.AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
 			return col;
 		}
 
-		public void AddCollider(Collider col)
+		public GridCollider CreateStaticCircleCollider(int cellsize, int w, int h, bool[] values)
 		{
-			if(col == null) throw new System.ArgumentNullException("CollisionManager.AddColider() col is null");
-			_bvh.Insert(col);
+			GridCollider grid = new GridCollider(w, h, cellsize);
+			grid.Set(w, h, values);
+			_static.AddCollider(grid);
+			return grid;
 		}
 
-		public void SetColliderGrid(int x, int y, bool value)
+		public RectCollider CreateRectCollider(string scene, Transform trans, int w, int h, bool isDynamic=false)
 		{
-			_grid.SetCollider(x, y, value);
+			if(!_scenes.ContainsKey(scene)) return null;
+			RectCollider col = new RectCollider(trans, w, h);
+			_scenes[scene].AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
+			return col;
 		}
 
-		public void RemoveCollider(Collider collider)
+		public CircleCollider CreateCircleCollider(string scene, Transform trans, int radius, bool isDynamic=false)
 		{
-			_bvh.Remove(collider);
+			if(!_scenes.ContainsKey(scene)) return null;
+			CircleCollider col = new CircleCollider(trans, radius);
+			_scenes[scene].AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
+			return col;
 		}
 
-		public bool ContainsCollider(Collider collider)
+		public GridCollider CreateCircleCollider(string scene, int cellsize, int w, int h, bool[] values)
 		{
-			return _bvh.Contains(collider);
+			if(!_scenes.ContainsKey(scene)) return null;
+			GridCollider grid = new GridCollider(w, h, cellsize);
+			grid.Set(w, h, values);
+			_scenes[scene].AddCollider(grid);
+			return grid;
+		}
+
+		public void AddStaticCollider(Collider col, bool isDynamic=false)
+		{
+			_static.AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
+		}
+
+		public void AddCollider(string scene, Collider col, bool isDynamic=false)
+		{
+			_scenes[scene].AddCollider(col, isDynamic);
+			if(isDynamic) _dynamicColliders.Add(col);
+		}
+
+		public void RemoveStaticCollider(Collider collider)
+		{
+			_static.RemoveCollider(collider);
+			if(_dynamicColliders.Contains(collider)) _dynamicColliders.Remove(collider);
+		}
+
+		public void RemoveCollider(string scene, Collider collider)
+		{
+			_scenes[scene].RemoveCollider(collider);
+			if(_dynamicColliders.Contains(collider)) _dynamicColliders.Remove(collider);
+		}
+
+		public bool ContainsStaticCollider(Collider collider)
+		{
+			return _static.ContainsCollider(collider);
+		}
+
+		public bool ContainsCollider(string scene, Collider collider)
+		{
+			if(!_scenes.ContainsKey(scene)) return false;
+			return _scenes[scene].ContainsCollider(collider);
 		}
 
 		public void Update()
 		{
 			if(Disposed) return;
-			_bvh.Update();
 
+			_static.CheckCollisions();
+			_scenes[CurrentScene].CheckCollisions();
+
+			_scenes[CurrentScene].CheckCollisions(_static);
 		}
+
 
 		public void Dispose()
 		{
@@ -78,8 +156,6 @@ namespace SuMamaEngine
 			{
 				if(!Disposed)
 				{
-					_bvh.Dispose();
-					_grid = null;
 					Disposed = true;
 				}
 			}

@@ -21,50 +21,33 @@ namespace SuMamaEngine
 
 		public Transform Transform;
 
-		public Action<CollisionInfo> CollisionEnter;
-		public Action<CollisionInfo> CollisionStay;
-		public Action<CollisionInfo> CollisionExit;
+		public Action<CollisionInfo> Collides;
 
 		public GameObject Object;
 
 		public CollisionTag Tags;
 
-		private HashSet<Collider> _currColliders;
-
 		public Collider()
 		{
-			_currColliders = new();
+			// _currColliders = new();
 			Tags = new CollisionTag();
 		}
 
-		public abstract bool CollidesWith(Collider other);
+		public abstract bool CollidesWith(Collider col);
+		public abstract bool CollidesWith(RectCollider col);
+		public abstract bool CollidesWith(CircleCollider col);
+		public abstract bool CollidesWith(GridCollider col);
 
-		public void CheckCollisionEvent(HashSet<Collider> currentColliders)
+		public void CheckCollisionEvent(ColliderContainer container)
 		{
-			foreach(Collider col in currentColliders)
+			foreach(var col in container.Colliders)
 			{
-				if(!Tags.CheckTags(col)) break;
-				if(!CollidesWith(col)) break;
+				if(this.Equals(col)) continue;
+				if(!Tags.CheckTags(col)) continue;
+				if(!CollidesWith(col)) continue;
 
-				if(!_currColliders.Contains(col))
-				{
-					CollisionEnter?.Invoke(new CollisionInfo(this, col));
-				}
-				else
-				{
-					CollisionStay?.Invoke(new CollisionInfo(this, col));
-				}
-			}
-
-			foreach(Collider col in _currColliders)
-			{
-				if(!currentColliders.Contains(col))
-				{
-					CollisionExit?.Invoke(new CollisionInfo(this, col));
-				}
-			}
-
-			_currColliders = currentColliders;
+				Collides?.Invoke(new CollisionInfo(this, col));
+			}	
 		}
 
 		public static bool CircleIntersectsRectangle(Vector2 cCenter, int radius, Rectangle rect)
@@ -127,7 +110,35 @@ namespace SuMamaEngine
 					col1.Transform.Position.Y += overlap.Height;
 				}
 			}
+		}
 
+		public static void ResolveCollisionGrid(Collider col1, GridCollider grid)
+		{
+			Rectangle rect = grid.GetRectangleOfCell(col1);
+			Rectangle overlap = Rectangle.Intersect(col1.Bounds.ToRectangle(), rect);
+
+			if(overlap.Width < overlap.Height)
+			{
+				if(col1.Transform.Position.X < rect.X)
+				{
+					col1.Transform.Position.X -= overlap.Width;
+				}
+				else
+				{
+					col1.Transform.Position.X += overlap.Width;
+				}
+			}
+			else
+			{
+				if(col1.Transform.Position.Y < rect.Y)
+				{
+					col1.Transform.Position.Y -= overlap.Height;
+				}
+				else
+				{
+					col1.Transform.Position.Y += overlap.Height;
+				}
+			}
 		}
 
 		public virtual void Draw(Color color)
@@ -147,10 +158,11 @@ namespace SuMamaEngine
 			{
 				if(!Disposed)
 				{
-					_currColliders.Clear();
-					CollisionEnter = null;
-					CollisionStay = null;
-					CollisionExit = null;
+					// _currColliders.Clear();
+					// CollisionEnter = null;
+					// CollisionStay = null;
+					// CollisionExit = null;
+					Collides = null;
 					Disposed = true;
 				}
 			}
