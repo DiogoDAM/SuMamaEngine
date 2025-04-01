@@ -22,7 +22,7 @@ namespace SuMamaEngine
 		}
 
 		private Dictionary<string, Scene> _scenes;
-		private Scene _currentScene;
+		public Scene CurrentScene;
 
 		private SceneManager()
 		{
@@ -31,30 +31,30 @@ namespace SuMamaEngine
 
 		public void Start()
 		{
-			if(_currentScene == null) throw new NullReferenceException("SceneManager.Start() Current scene is null");
+			if(CurrentScene == null) throw new NullReferenceException("SceneManager.Start() Current scene is null");
 
-			_currentScene.Start();
+			CurrentScene.Start();
 		}
 
 		public void Update()
 		{
-			if(_currentScene == null) throw new NullReferenceException("SceneManager.Update() Current scene is null");
+			if(CurrentScene == null) throw new NullReferenceException("SceneManager.Update() Current scene is null");
 
-			_currentScene.Update();
+			CurrentScene.Update();
 		}
 
 		public void Draw()
 		{
-			if(_currentScene == null) throw new NullReferenceException("SceneManager.Draw() Current scene is null");
+			if(CurrentScene == null) throw new NullReferenceException("SceneManager.Draw() Current scene is null");
 
-			_currentScene.Draw();
+			CurrentScene.Draw();
 		}
 
 		public void DrawUi()
 		{
-			if(_currentScene == null) throw new NullReferenceException("SceneManager.DrawUi() Current scene is null");
+			if(CurrentScene == null) throw new NullReferenceException("SceneManager.DrawUi() Current scene is null");
 
-			_currentScene.DrawUi();
+			CurrentScene.DrawUi();
 		}
 
 		//Methods for handle the current scene
@@ -64,9 +64,9 @@ namespace SuMamaEngine
 			if(scene == null) throw new ArgumentNullException("SceneManager.SwitchScene() scene is null");
 			if(_scenes.ContainsValue(scene))
 			{
-				if(_currentScene != null) _currentScene.Enter();
-				_currentScene = scene;
-				_currentScene.Exit();
+				if(CurrentScene != null) CurrentScene.Enter();
+				CurrentScene = scene;
+				CurrentScene.Exit();
 			}
 		}
 
@@ -75,20 +75,27 @@ namespace SuMamaEngine
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.SwitchScene() sceneId is empty or null");
 			if(_scenes.ContainsKey(sceneId))
 			{
-				if(_currentScene != null) _currentScene.Enter();
-				_currentScene = _scenes[sceneId];
-				_currentScene.Exit();
+				if(CurrentScene != null) CurrentScene.Enter();
+				CurrentScene = _scenes[sceneId];
+				CurrentScene.Exit();
 			}
 
 		}
 
 		//  Methods for handle the _scenes dict
+		
+		public Scene GetScene(string sceneId)
+		{
+			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.GetScene() sceneId is null or Empty");
+			if(_scenes.ContainsKey(sceneId)) return _scenes[sceneId];
+			return null;
+		}
 
 		public void AddScene(Scene scene)
 		{
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			_scenes.Add(scene.Id, scene);
-			if(_currentScene == null) ChangeScene(scene);
+			if(CurrentScene == null) ChangeScene(scene);
 		}
 
 		public void AddScene(string sceneId, Scene scene)
@@ -96,7 +103,7 @@ namespace SuMamaEngine
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.AddScene() sceneId is null or Empty");
 			_scenes.Add(sceneId, scene);
-			if(_currentScene == null) ChangeScene(sceneId);
+			if(CurrentScene == null) ChangeScene(sceneId);
 		}
 
 		public void RemoveScene(Scene scene)
@@ -149,53 +156,6 @@ namespace SuMamaEngine
 			}
 
 			return null;
-		}
-		// Methods for handle the gameObjects in current Scene
-
-		public void InstantiateObject(GameObject obj)
-		{
-			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
-			_currentScene.AddObject((GameObject)obj.DeepClone());
-		}
-
-		public void InstantiateObject(GameObject obj, Transform trans)
-		{
-			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
-			obj.Transform = trans;
-			_currentScene.AddObject((GameObject)obj.DeepClone());
-		}
-
-		public void SpawnObject(GameObject obj)
-		{
-			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
-			_currentScene.AddObject(obj);
-		}
-
-		public void SpawnObject(GameObject obj, Transform transParent)
-		{
-			if(obj == null) throw new ArgumentNullException("Intantiate() obj is null");
-			obj.Transform = transParent;
-			_currentScene.AddObject(obj);
-		}
-
-		public void RemoveObject(GameObject obj)
-		{
-			if(obj == null) throw new ArgumentNullException("RemoveObject() obj is null");
-			if(_currentScene.ContainsObject(obj))
-			{
-				_currentScene.RemoveObject(obj);
-			}
-		}
-
-		public void DestroyObject(GameObject obj)
-		{
-			if(obj == null) throw new ArgumentNullException("Destroy() obj is null");
-			if(_currentScene.ContainsObject(obj))
-			{
-				_currentScene.RemoveObject(obj);
-			}
-
-			obj.Dispose();
 		}
 	}
 }

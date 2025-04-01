@@ -12,13 +12,13 @@ namespace SuMamaEngine
 		private Vector2 _dir;
 		private float _speed;
 
-		private Vector2 _origin;
 		private Vector2 _scale;
 		private float _rot;
 		private float _angle;
 		private float _opacity;
 		private float _depth;
 		private float _amount;
+		private Vector2 _anchor;
 
 		public ParticleData Data { get; private set; }
 
@@ -36,7 +36,7 @@ namespace SuMamaEngine
 			_color = Data.StartColor;
 			_pos = Data.Position;
 			_speed = Data.Speed;
-			_origin = Vector2.Zero;
+			_anchor = Data.Anchor;
 			_scale = Data.StartScale;
 			_rot = Data.StartRotation;
 			_opacity = Data.StartOpacity;
@@ -56,6 +56,7 @@ namespace SuMamaEngine
 			_scale.X = MathHelper.Lerp(Data.EndScale.X, Data.StartScale.X, _amount);
 			_scale.Y = MathHelper.Lerp(Data.EndScale.Y, Data.StartScale.Y, _amount);
 			_angle = MathHelper.ToRadians(MathHelper.Lerp(Data.EndAngle, Data.StartAngle, _amount));
+			_rot = MathHelper.Lerp(Data.EndRotation, Data.StartRotation, _amount);
 			_dir = new Vector2((float)Math.Cos(_angle), (float)Math.Sin(_angle));
 			_pos += _dir * _speed * Globals.DeltaTime;
 
@@ -63,7 +64,7 @@ namespace SuMamaEngine
 
 		public void Draw()
 		{
-			Globals.SpriteBatch.Draw(_sprite.Texture, _pos, _sprite.Bounds, _color * _opacity, _rot, _origin, _scale, SpriteEffects.None, _depth);
+			Globals.SpriteBatch.Draw(_sprite.Texture, _pos, _sprite.Bounds, _color * _opacity, _rot, _anchor, _scale, SpriteEffects.None, _depth);
 		}
 
 		public void Dispose()

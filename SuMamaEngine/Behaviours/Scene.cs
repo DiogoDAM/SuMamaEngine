@@ -8,17 +8,26 @@ namespace SuMamaEngine
 	public abstract class Scene : IDisposable
 	{
 		protected Dictionary<string, SceneLayer> _layers;
+		protected Dictionary<string, GameObject> _taggedObjs;
 		protected WorldCollisor _world;
 		protected Camera _camera;
 
+		private Queue<GameObject> _poolForAdd;
+		private Queue<GameObject> _poolForRemove;
+
 		public string Id;
+
+		public int ObjectCount { get { int count = 0; foreach(var layer in _layers) count += layer.Value.Count; return count; } }
 
 		public bool Disposed { get; protected set; }
 
 		public Scene()
 		{
 			_layers = new Dictionary<string, SceneLayer>();
+			_taggedObjs = new();
 			_world = new();
+			_poolForAdd = new();
+			_poolForRemove = new();
 			Disposed = false;
 		}
 
@@ -47,11 +56,32 @@ namespace SuMamaEngine
 		public virtual void Update()
 		{
 			if(Disposed) return;
+
+			UpdatePools();
+
 			foreach(var layer in _layers)
 			{
 				layer.Value.Update();
 			}
 			_world.CheckCollisions();
+		}
+
+		private void UpdatePools()
+		{
+			while(_poolForAdd.Count > 0)
+			{
+				var obj = _poolForAdd.Dequeue();
+				obj.OnAdd();
+				_layers[obj.Layer].Add(obj);
+				obj.Start();
+			}
+
+			while(_poolForRemove.Count > 0)
+			{
+				var obj = _poolForRemove.Dequeue();
+				obj.OnRemoved();
+				_layers[obj.Layer].Remove(obj);
+			}
 		}
 
 		public virtual void Draw()
@@ -79,35 +109,74 @@ namespace SuMamaEngine
 			if(Disposed) return;
 		}
 
+		//Tag Handlers
+
+		public void AddTag(string tag)
+		{
+			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.AddTag() tag is null or empty");
+
+			if(!_taggedObjs.ContainsKey(tag)) _taggedObjs.Add(tag, null);
+		}
+		
+		public void AddTag(string tag, GameObject obj)
+		{
+			if(obj == null) throw new ArgumentNullException("Scene.AddTag() obj is null");
+			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.AddTag() tag is null or empty");
+
+			if(!_taggedObjs.ContainsKey(tag)) _taggedObjs.Add(tag, obj);
+		}
+
+		public void RemoveTag(string tag)
+		{
+			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.RemoveTag() tag is null or empty");
+
+			if(_taggedObjs.ContainsKey(tag)) _taggedObjs.Remove(tag);
+		}
+
+		public GameObject GetObjectFromTag(string tag)
+		{
+			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.GetObjectFromTag() tag is null or empty");
+
+			if(_taggedObjs.ContainsKey(tag)) return _taggedObjs[tag];
+			return null;
+		}
+
+		public void SetObjectInTag(string tag, GameObject obj)
+		{
+			if(obj == null) throw new ArgumentNullException("Scene.SetObjectInTag() obj is null");
+			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.SetObjectInTag() tag is null or empty");
+
+			if(_taggedObjs.ContainsKey(tag)) _taggedObjs[tag] = obj;
+		}
+
+		// GameObject Handlers
+
 		public void AddObject(string layer, GameObject e)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.AddEnttiy() layer is null or empty");
 			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
 			e.Layer = layer;
-			e.OnAdd();
-			_layers[layer].Add(e);
+			_poolForAdd.Enqueue(e);
 		}
 
 		public void AddObject(GameObject e)
 		{
 			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
-			e.OnAdd();
-			_layers[e.Layer].Add(e);
+			_poolForAdd.Enqueue(e);
 		}
 
 		public void RemoveObject(string layer, GameObject e)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.RemoveEnttiy() layer is null or empty");
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
-			e.OnRemoved();
-			_layers[layer].Remove(e);
+			e.Layer = layer;
+			_poolForRemove.Enqueue(e);
 		}
 
 		public void RemoveObject(GameObject e)
 		{
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
-			e.OnRemoved();
-			_layers[e.Layer].Remove(e);
+			_poolForRemove.Enqueue(e);
 		}
 
 		public bool ContainsObject(GameObject e)
@@ -178,6 +247,32 @@ namespace SuMamaEngine
 			_camera = camera;
 		}
 
+		public RectCollider CreateRectCollider(Transform trans, int w, int h, bool isDynamic=false)
+		{
+			RectCollider rect = new(trans, w, h);
+			_world.AddCollider(rect, isDynamic);
+			return rect;
+		}
+
+		public CircleCollider CreateCircleCollider(Transform trans, int radius, bool isDynamic=false)
+		{
+			CircleCollider circle = new(trans, radius);
+			_world.AddCollider(circle, isDynamic);
+			return circle;
+		}
+
+		public void AddCollider(Collider col, bool isDynamic=false)
+		{
+			if(col == null) throw new ArgumentNullException("Scene.AddCollider() col is null");
+			_world.AddCollider(col, isDynamic);
+		}
+
+		public void RemoveCollider(Collider col)
+		{
+			if(col == null) throw new ArgumentNullException("Scene.RemoveCollider() col is null");
+			_world.RemoveCollider(col);
+		}
+
 		public void Dispose()
 		{
 			Dispose(true);
@@ -191,7 +286,10 @@ namespace SuMamaEngine
 				if(!Disposed)
 				{
 					_layers.Clear();
+					_poolForAdd.Clear();
+					_poolForRemove.Clear();
 					_camera.Dispose();
+					_world.Dispose();
 					Disposed = true;
 				}
 			}

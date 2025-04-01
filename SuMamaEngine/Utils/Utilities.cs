@@ -7,6 +7,7 @@ namespace SuMamaEngine
 	{
 		public static Random Random = new Random();
 
+		//Convert a cartesian pos for an isometric pos for show in the screen
 		public static Vector2 CarToIsoScreen(int mapx, int mapy, int tileWidth, int tileHeight)
 		{
 			return new Vector2((mapx - mapy) * (tileWidth/2), (mapx + mapy) * (tileHeight/2));
@@ -17,6 +18,7 @@ namespace SuMamaEngine
 			return new Vector2((map.X - map.Y) * (tileWidth/2)-16, (map.X + map.Y) * (tileHeight/2)-20);
 		}
 
+		//Convert a cartesian pos for handle an isometric map in the code
 		public static Vector2 CarToIsoMap(Vector2 worldPos, int tileWidth, int tileHeight)
 		{
 			float mapX = (worldPos.X / (tileWidth/2) + worldPos.Y / (tileHeight/2) ) / 2;

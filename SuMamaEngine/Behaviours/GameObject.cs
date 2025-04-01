@@ -53,20 +53,83 @@ namespace SuMamaEngine
 		}
 
 		// Static Methods for handle Entities in Current scene
-
-		public static void Instantiate(GameObject e)
+		
+		public static void AddToScene(GameObject obj)
 		{
-			SceneManager.Instance.InstantiateObject(e);
+			SceneManager.Instance.CurrentScene.AddObject(obj);
 		}
 
-		public static void Instantiate(GameObject e, Transform trans)
+		public static void AddToScene(string layer, GameObject obj)
 		{
-			SceneManager.Instance.InstantiateObject(e, trans);
+			SceneManager.Instance.CurrentScene.AddObject(layer, obj);
+		}
+
+		public static T Instantiate<T>(T original) where T : GameObject, new()
+		{
+			T newInstance = new T();
+
+			newInstance = (T) original.DeepClone();
+
+			SceneManager.Instance.CurrentScene.AddObject(newInstance);
+
+			return newInstance;
+		}
+
+		public static T Instantiate<T>(string layer, T original) where T : GameObject, new()
+		{
+			T newInstance = new T();
+
+			newInstance = (T) original.DeepClone();
+
+			SceneManager.Instance.CurrentScene.AddObject(layer, newInstance);
+
+			return newInstance;
+		}
+
+		public static T Instantiate<T>(T original, Vector2 pos) where T : GameObject, new()
+		{
+			T newInstance = new T();
+
+			newInstance = (T) original.DeepClone();
+
+			newInstance.Transform.Position = pos;
+			SceneManager.Instance.CurrentScene.AddObject(newInstance);
+
+			return newInstance;
+		}
+
+		public static T Instantiate<T>(string layer, T original, Vector2 pos) where T : GameObject, new()
+		{
+			T newInstance = new T();
+
+			newInstance = (T) original.DeepClone();
+
+			newInstance.Transform.Position = pos;
+			SceneManager.Instance.CurrentScene.AddObject(layer, newInstance);
+
+			return newInstance;
+		}
+
+		public static void RemoveToScene(GameObject e)
+		{
+			SceneManager.Instance.CurrentScene.RemoveObject(e);
+		}
+
+		public static void RemoveToScene(string layer, GameObject e)
+		{
+			SceneManager.Instance.CurrentScene.RemoveObject(layer, e);
 		}
 
 		public static void Destroy(GameObject e)
 		{
-			SceneManager.Instance.DestroyObject(e);
+			SceneManager.Instance.CurrentScene.RemoveObject(e);
+			e.Dispose();
+		}
+
+		public static void Destroy(GameObject e, string layer)
+		{
+			SceneManager.Instance.CurrentScene.RemoveObject(layer, e);
+			e.Dispose();
 		}
 
 		// Methods for handle the Dispose

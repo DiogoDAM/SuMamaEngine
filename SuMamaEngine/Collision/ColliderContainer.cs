@@ -1,12 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 namespace SuMamaEngine
 {
-	public class ColliderContainer
+	public sealed class ColliderContainer : IDisposable
 	{
 		public List<Collider> Colliders;
 
 		public int Count { get { return Colliders.Count; } }
+
+		public bool Disposed { get; private set; }
 
 		public ColliderContainer()
 		{
@@ -57,5 +60,22 @@ namespace SuMamaEngine
 			return list;
 		}
 
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposable)
+		{
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					Colliders.Clear();
+					Disposed = true;
+				}
+			}
+		}
 	}
 }

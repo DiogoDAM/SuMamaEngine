@@ -32,5 +32,15 @@ namespace SuMamaEngine
 
 			return false;
 		}
+
+		public bool HasTag(int t)
+		{
+			foreach(int tag in OwnTags)
+			{
+				if(tag == t) return true;
+			}
+
+			return false;
+		}
 	}
 }

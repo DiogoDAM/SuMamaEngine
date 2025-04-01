@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace SuMamaEngine
 {
-	public class WorldCollisor
+	public sealed class WorldCollisor : IDisposable
 	{
 		public ColliderContainer Colliders;
 
@@ -10,6 +11,8 @@ namespace SuMamaEngine
 
 		public int Count { get { return Colliders.Count; } }
 		public int DynamicsCount { get { return _dynamics.Count; } }
+
+		public bool Disposed { get; private set; }
 
 		public WorldCollisor()
 		{
@@ -61,6 +64,25 @@ namespace SuMamaEngine
 			{
 				Colliders.Remove(d);
 				Colliders.Add(d);
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposable)
+		{
+			if(disposable)
+			{
+				if(!Disposed)
+				{
+					_dynamics.Clear();
+					Colliders.Dispose();
+					Disposed = true;
+				}
 			}
 		}
 	}

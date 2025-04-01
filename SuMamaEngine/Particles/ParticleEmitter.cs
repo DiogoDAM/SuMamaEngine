@@ -39,6 +39,7 @@ namespace SuMamaEngine
 			pd.Speed = Utilities.RandomFloat(_data.SpeedMin, _data.SpeedMax);
 			float r = (float) Utilities.Random.NextDouble() * 2 - 1;
 			pd.StartAngle += _data.AngleVariance * r;
+			pd.EndAngle = pd.StartAngle;
 
 			Particle p = new(pd, _depth);
 			ParticleManager.Instance.AddParticle(p);

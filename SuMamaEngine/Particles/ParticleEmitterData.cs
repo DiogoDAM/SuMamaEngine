@@ -3,7 +3,6 @@ namespace SuMamaEngine
 	public struct ParticleEmitterData
 	{
 		public ParticleData ParticleData;
-		public float Angle;
 		public float AngleVariance;
 		public float LifeSpanMin;
 		public float LifeSpanMax;
@@ -11,5 +10,12 @@ namespace SuMamaEngine
 		public float SpeedMax;
 		public float Interval;
 		public float EmitCount;
+
+		public ParticleEmitterData(ParticleData data, float interval, float emitCount)
+		{
+			ParticleData = data;
+			Interval = interval;
+			EmitCount = emitCount;
+		}
 	}
 }

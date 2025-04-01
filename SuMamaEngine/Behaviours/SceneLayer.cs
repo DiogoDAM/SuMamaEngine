@@ -65,6 +65,11 @@ namespace SuMamaEngine
 			return _objs.Find((it) => it.Equals(obj));
 		}
 
+		public void Sort(Comparison<GameObject> con)
+		{
+			_objs.Sort(con);
+		}
+
 		public T GetEntityType<T>() where T : GameObject
 		{
 			return (T)_objs.Find((e) => e is T);
