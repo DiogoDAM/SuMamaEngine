@@ -44,6 +44,7 @@ namespace SuMamaEngine
 		public void CheckCollisions()
 		{
 			MoveDynamics();
+
 			foreach(var col in _dynamics)
 			{
 				col.CheckCollisionEvent(Colliders);

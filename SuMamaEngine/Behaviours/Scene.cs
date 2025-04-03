@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SuMamaEngine
 {
@@ -20,6 +21,7 @@ namespace SuMamaEngine
 		public int ObjectCount { get { int count = 0; foreach(var layer in _layers) count += layer.Value.Count; return count; } }
 
 		public bool Disposed { get; protected set; }
+		public bool IsActive { get; protected set; }
 
 		public Scene()
 		{
@@ -57,12 +59,14 @@ namespace SuMamaEngine
 		{
 			if(Disposed) return;
 
+
 			UpdatePools();
 
 			foreach(var layer in _layers)
 			{
 				layer.Value.Update();
 			}
+
 			_world.CheckCollisions();
 		}
 
@@ -100,13 +104,14 @@ namespace SuMamaEngine
 
 		public virtual void Enter()
 		{
+			IsActive = true;
 			if(Disposed) return;
-			Start();
 		}
 
 		public virtual void Exit()
 		{
-			if(Disposed) return;
+			IsActive = false;
+			return;
 		}
 
 		//Tag Handlers

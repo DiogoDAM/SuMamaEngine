@@ -22,11 +22,21 @@ namespace SuMamaEngine
 		}
 
 		private Dictionary<string, Scene> _scenes;
+		private Dictionary<string, Transition> _transitions;
 		public Scene CurrentScene;
+
+		private Scene _nextScene;
+		private Transition _transitionIn;
+		private Transition _transitionOut;
+		private Scene _previousScene;
+		private bool _sceneChanged;
+
+		public bool IsChangingScene { get; private set; }
 
 		private SceneManager()
 		{
 			_scenes = new Dictionary<string, Scene>();
+			_transitions = new Dictionary<string, Transition>();
 		}
 
 		public void Start()
@@ -40,14 +50,29 @@ namespace SuMamaEngine
 		{
 			if(CurrentScene == null) throw new NullReferenceException("SceneManager.Update() Current scene is null");
 
-			CurrentScene.Update();
+			if(IsChangingScene)
+			{
+				ProcessSceneChangeUpdate();
+			}
+
+			if(!IsChangingScene)
+			{
+				CurrentScene.Update();
+			}
+
 		}
 
 		public void Draw()
 		{
 			if(CurrentScene == null) throw new NullReferenceException("SceneManager.Draw() Current scene is null");
 
+			if(IsChangingScene)
+			{
+				ProcessSceneChangeDraw();
+			}
+
 			CurrentScene.Draw();
+
 		}
 
 		public void DrawUi()
@@ -58,28 +83,125 @@ namespace SuMamaEngine
 		}
 
 		//Methods for handle the current scene
-
-		public void ChangeScene(Scene scene)
+		//
+		public void ChangeScene(Scene scene, string transIn, string transOut)
 		{
-			if(scene == null) throw new ArgumentNullException("SceneManager.SwitchScene() scene is null");
+			if(scene == null) throw new ArgumentNullException("SceneManager.ChangeScene() scene is null");
 			if(_scenes.ContainsValue(scene))
 			{
-				if(CurrentScene != null) CurrentScene.Enter();
-				CurrentScene = scene;
-				CurrentScene.Exit();
+				_nextScene = scene;
+				_previousScene = CurrentScene;
+				_transitionIn = _transitions[transIn];
+				_transitionOut = _transitions[transOut];
+				_transitionIn.Reset();
+				_transitionOut.Reset();
+				_sceneChanged = false;
+				IsChangingScene = true;
 			}
+		}
+
+		public void ChangeScene(string sceneId, string transIn, string transOut)
+		{
+			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.ChangeScene() sceneId is empty or null");
+			if(_scenes.ContainsKey(sceneId))
+			{
+				_nextScene = _scenes[sceneId];
+				_previousScene = CurrentScene;
+				_transitionIn = _transitions[transIn];
+				_transitionOut = _transitions[transOut];
+				_transitionIn.Reset();
+				_transitionOut.Reset();
+				_sceneChanged = false;
+				IsChangingScene = true;
+			}
+			else
+			{
+			    throw new Exception("SceneManager.ChangeScene() don't has a scene to correspond the sceneId");
+			}
+
 		}
 
 		public void ChangeScene(string sceneId)
 		{
-			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.SwitchScene() sceneId is empty or null");
+			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.ChangeScene() sceneId is empty or null");
 			if(_scenes.ContainsKey(sceneId))
 			{
-				if(CurrentScene != null) CurrentScene.Enter();
-				CurrentScene = _scenes[sceneId];
-				CurrentScene.Exit();
-			}
+				if(CurrentScene == null)
+				{
+					_nextScene = _scenes[sceneId];
+					_nextScene.Enter();
+					CurrentScene = _nextScene;
+					_nextScene.Start();
+				}
+				else
+				{
+					_nextScene = _scenes[sceneId];
+					_nextScene.Enter();
+					_previousScene = CurrentScene;
 
+					CurrentScene = _nextScene;
+					_nextScene.Start();
+					_previousScene.Exit();
+				}
+			}
+			else
+			{
+			    throw new Exception("SceneManager.ChangeScene() don't has a scene to correspond the sceneId");
+			}
+			_previousScene = null;
+			_nextScene = null;
+
+		}
+
+		private void ProcessSceneChangeUpdate()
+		{
+			_nextScene.Enter();
+			_transitionIn.Update();
+			if(_transitionIn.IsCompleted)
+			{
+				if(!_sceneChanged) 
+				{
+					CurrentScene = _nextScene;
+					_nextScene.Start();
+					_previousScene.Exit();
+					_sceneChanged = true;
+				}
+				_transitionOut.Update();
+
+				if(_transitionOut.IsCompleted)
+				{
+					IsChangingScene = false;
+					_transitionIn = null;
+					_transitionOut = null;
+				}
+			}
+		}
+
+		private void ProcessSceneChangeDraw()
+		{
+			if(_transitionIn.IsCompleted)
+			{
+				_transitionOut.Draw();
+			}
+			else
+			{
+			    _transitionIn.Draw();
+			}
+		}
+
+		// Methods for Transitions
+
+		public void AddTransition(string name, Transition transition)
+		{
+			if(string.IsNullOrEmpty(name)) throw new ArgumentNullException("SceneManager.AddTransition() name is null or empty");
+			if(transition == null) throw new ArgumentNullException("SceneManager.AddTransition() transition is null");
+			_transitions.Add(name, transition);
+		}
+
+		public void RemoveTransition(string name)
+		{
+			if(string.IsNullOrEmpty(name)) throw new ArgumentNullException("SceneManager.RemoveTransition() name is null or empty");
+			_transitions.Remove(name);
 		}
 
 		//  Methods for handle the _scenes dict
@@ -95,7 +217,6 @@ namespace SuMamaEngine
 		{
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			_scenes.Add(scene.Id, scene);
-			if(CurrentScene == null) ChangeScene(scene);
 		}
 
 		public void AddScene(string sceneId, Scene scene)
@@ -103,7 +224,6 @@ namespace SuMamaEngine
 			if(scene == null) throw new ArgumentNullException("SceneManager.AddScene() scene is null");
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.AddScene() sceneId is null or Empty");
 			_scenes.Add(sceneId, scene);
-			if(CurrentScene == null) ChangeScene(sceneId);
 		}
 
 		public void RemoveScene(Scene scene)
