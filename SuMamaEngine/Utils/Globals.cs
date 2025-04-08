@@ -23,6 +23,7 @@ namespace SuMamaEngine
 			SpriteBatch = new SpriteBatch(graphicsDevice);
 			_graphics = graphics;
 			Content = content;
+			Drawer.Initialize(graphicsDevice);
 		}
 
 		public static void ResizeWindow(int width, int height)

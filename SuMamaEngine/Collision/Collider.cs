@@ -20,6 +20,8 @@ namespace SuMamaEngine
 
 		public Transform Transform;
 
+		public GameObject GameObject;
+
 		public Action<CollisionInfo> Collides;
 
 		public GameObject Object;
@@ -30,6 +32,14 @@ namespace SuMamaEngine
 		{
 			// _currColliders = new();
 			Tags = new CollisionTag();
+		}
+
+		public Collider(GameObject obj)
+		{
+			// _currColliders = new();
+			Tags = new CollisionTag();
+
+			GameObject = obj;
 		}
 
 		public abstract bool CollidesWith(Collider col);
@@ -46,6 +56,7 @@ namespace SuMamaEngine
 				if(!CollidesWith(col)) continue;
 
 				Collides?.Invoke(new CollisionInfo(this, col));
+				col.Collides?.Invoke(new CollisionInfo(col, this));
 			}	
 		}
 

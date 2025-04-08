@@ -41,6 +41,11 @@ namespace SuMamaEngine
 			return Colliders.Find((c) => c.Equals(col));
 		}
 
+		public void Clear()
+		{
+			Colliders.Clear();
+		}
+
 		public bool Collide(Collider col)
 		{
 			foreach(var c in Colliders)

@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SuMamaEngine
 {
@@ -14,7 +13,7 @@ namespace SuMamaEngine
 		protected Camera _camera;
 
 		private Queue<GameObject> _poolForAdd;
-		private Queue<GameObject> _poolForRemove;
+		private Queue<(bool, GameObject)> _poolForRemove;
 
 		public string Id;
 
@@ -59,15 +58,14 @@ namespace SuMamaEngine
 		{
 			if(Disposed) return;
 
-
-			UpdatePools();
-
 			foreach(var layer in _layers)
 			{
 				layer.Value.Update();
 			}
 
 			_world.CheckCollisions();
+
+			UpdatePools();
 		}
 
 		private void UpdatePools()
@@ -75,16 +73,21 @@ namespace SuMamaEngine
 			while(_poolForAdd.Count > 0)
 			{
 				var obj = _poolForAdd.Dequeue();
-				obj.OnAdd();
+				if(string.IsNullOrEmpty(obj.Layer)) throw new ArgumentNullException("Scene.AddObject() obj.Layer is null or empty");
 				_layers[obj.Layer].Add(obj);
+				obj.Added();
 				obj.Start();
 			}
 
 			while(_poolForRemove.Count > 0)
 			{
-				var obj = _poolForRemove.Dequeue();
-				obj.OnRemoved();
-				_layers[obj.Layer].Remove(obj);
+				var item = _poolForRemove.Dequeue();
+				_layers[item.Item2.Layer].Remove(item.Item2);
+				item.Item2.Removed();
+				if(item.Item1)
+				{
+					item.Item2.Dispose();
+				}
 			}
 		}
 
@@ -111,6 +114,8 @@ namespace SuMamaEngine
 		public virtual void Exit()
 		{
 			IsActive = false;
+			_world.ClearAndDispose();
+			ClearObjects();
 			return;
 		}
 
@@ -170,18 +175,18 @@ namespace SuMamaEngine
 			_poolForAdd.Enqueue(e);
 		}
 
-		public void RemoveObject(string layer, GameObject e)
+		public void RemoveObject(string layer, GameObject e, bool disposable=false)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.RemoveEnttiy() layer is null or empty");
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
 			e.Layer = layer;
-			_poolForRemove.Enqueue(e);
+			_poolForRemove.Enqueue((disposable, e));
 		}
 
-		public void RemoveObject(GameObject e)
+		public void RemoveObject(GameObject e, bool disposable=false)
 		{
 			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
-			_poolForRemove.Enqueue(e);
+			_poolForRemove.Enqueue((disposable, e));
 		}
 
 		public bool ContainsObject(GameObject e)
@@ -252,16 +257,17 @@ namespace SuMamaEngine
 			_camera = camera;
 		}
 
-		public RectCollider CreateRectCollider(Transform trans, int w, int h, bool isDynamic=false)
+		public RectCollider CreateRectCollider(Transform trans, int w, int h, GameObject obj=null, bool isDynamic=false)
 		{
-			RectCollider rect = new(trans, w, h);
+			RectCollider rect = new(trans, w, h, obj);
 			_world.AddCollider(rect, isDynamic);
 			return rect;
 		}
 
-		public CircleCollider CreateCircleCollider(Transform trans, int radius, bool isDynamic=false)
+
+		public CircleCollider CreateCircleCollider(Transform trans, int radius, GameObject obj=null, bool isDynamic=false)
 		{
-			CircleCollider circle = new(trans, radius);
+			CircleCollider circle = new(trans, radius, obj);
 			_world.AddCollider(circle, isDynamic);
 			return circle;
 		}

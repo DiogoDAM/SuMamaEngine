@@ -85,10 +85,14 @@ namespace SuMamaEngine
 			{
 				if(!Disposed)
 				{
-					Texture.Dispose();
 					Disposed = true;
 				}
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"Sprite : (Texture: {Texture}, Bounds : {Bounds.ToString()}, Color: {Color}, Flip: {Flip})";
 		}
 	}
 }

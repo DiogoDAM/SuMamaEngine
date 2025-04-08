@@ -16,6 +16,13 @@ namespace SuMamaEngine
 			Height = h;
 		}
 
+		public RectCollider(Transform trans, int w, int h, GameObject obj) : base(obj)
+		{
+			Transform = trans;
+			Width = w;
+			Height = h;
+		}
+
 		public override bool CollidesWith(Collider col)
 		{
 			switch(col)

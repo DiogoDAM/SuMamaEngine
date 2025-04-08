@@ -41,6 +41,16 @@ namespace SuMamaEngine
 			return Colliders.Contains(col);
 		}
 
+		public void ClearAndDispose()
+		{
+			foreach(Collider col in Colliders.Colliders)
+			{
+				col.Dispose();
+			}
+
+			Colliders.Clear();
+		}
+
 		public void CheckCollisions()
 		{
 			MoveDynamics();
@@ -61,7 +71,7 @@ namespace SuMamaEngine
 
 		private void MoveDynamics()
 		{
-			foreach(Collider d in _dynamics)
+			foreach(var d in _dynamics)
 			{
 				Colliders.Remove(d);
 				Colliders.Add(d);

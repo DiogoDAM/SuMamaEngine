@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 
 namespace SuMamaEngine
@@ -12,6 +11,12 @@ namespace SuMamaEngine
 		public int Radius;
 
 		public CircleCollider(Transform trans, int radius) : base()
+		{
+			Transform = trans;
+			Radius = radius;
+		}
+
+		public CircleCollider(Transform trans, int radius, GameObject obj) : base(obj)
 		{
 			Transform = trans;
 			Radius = radius;

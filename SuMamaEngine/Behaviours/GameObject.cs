@@ -44,11 +44,11 @@ namespace SuMamaEngine
 			if(Disposed) return;
 		}
 
-		public virtual void OnAdd()
+		public virtual void Added()
 		{
 		}
 
-		public virtual void OnRemoved()
+		public virtual void Removed()
 		{
 		}
 
@@ -110,26 +110,24 @@ namespace SuMamaEngine
 			return newInstance;
 		}
 
-		public static void RemoveToScene(GameObject e)
+		public static void RemoveOfScene(GameObject e)
 		{
 			SceneManager.Instance.CurrentScene.RemoveObject(e);
 		}
 
-		public static void RemoveToScene(string layer, GameObject e)
+		public static void RemoveOfScene(string layer, GameObject e)
 		{
 			SceneManager.Instance.CurrentScene.RemoveObject(layer, e);
 		}
 
 		public static void Destroy(GameObject e)
 		{
-			SceneManager.Instance.CurrentScene.RemoveObject(e);
-			e.Dispose();
+			SceneManager.Instance.CurrentScene.RemoveObject(e, true);
 		}
 
 		public static void Destroy(GameObject e, string layer)
 		{
-			SceneManager.Instance.CurrentScene.RemoveObject(layer, e);
-			e.Dispose();
+			SceneManager.Instance.CurrentScene.RemoveObject(layer, e, true);
 		}
 
 		// Methods for handle the Dispose

@@ -83,36 +83,33 @@ namespace SuMamaEngine
 		}
 
 		//Methods for handle the current scene
-		//
-		public void ChangeScene(Scene scene, string transIn, string transOut)
-		{
-			if(scene == null) throw new ArgumentNullException("SceneManager.ChangeScene() scene is null");
-			if(_scenes.ContainsValue(scene))
-			{
-				_nextScene = scene;
-				_previousScene = CurrentScene;
-				_transitionIn = _transitions[transIn];
-				_transitionOut = _transitions[transOut];
-				_transitionIn.Reset();
-				_transitionOut.Reset();
-				_sceneChanged = false;
-				IsChangingScene = true;
-			}
-		}
 
 		public void ChangeScene(string sceneId, string transIn, string transOut)
 		{
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.ChangeScene() sceneId is empty or null");
 			if(_scenes.ContainsKey(sceneId))
 			{
-				_nextScene = _scenes[sceneId];
-				_previousScene = CurrentScene;
-				_transitionIn = _transitions[transIn];
-				_transitionOut = _transitions[transOut];
-				_transitionIn.Reset();
-				_transitionOut.Reset();
-				_sceneChanged = false;
-				IsChangingScene = true;
+				if(CurrentScene == null)
+				{
+					_nextScene = _scenes[sceneId];
+					_transitionIn = _transitions[transIn];
+					_transitionOut = _transitions[transOut];
+					_transitionIn.Reset();
+					_transitionOut.Reset();
+					_sceneChanged = false;
+					IsChangingScene = true;
+				}
+				else
+				{
+					_nextScene = _scenes[sceneId];
+					_previousScene = CurrentScene;
+					_transitionIn = _transitions[transIn];
+					_transitionOut = _transitions[transOut];
+					_transitionIn.Reset();
+					_transitionOut.Reset();
+					_sceneChanged = false;
+					IsChangingScene = true;
+				}
 			}
 			else
 			{
@@ -126,12 +123,11 @@ namespace SuMamaEngine
 			if(string.IsNullOrEmpty(sceneId)) throw new ArgumentNullException("SceneManager.ChangeScene() sceneId is empty or null");
 			if(_scenes.ContainsKey(sceneId))
 			{
-				if(CurrentScene == null)
+				if(CurrentScene == null) // If this scene is the first scene of the game
 				{
 					_nextScene = _scenes[sceneId];
 					_nextScene.Enter();
 					CurrentScene = _nextScene;
-					_nextScene.Start();
 				}
 				else
 				{
