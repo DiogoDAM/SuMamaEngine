@@ -16,7 +16,7 @@ namespace SuMamaEngine
 			Radius = radius;
 		}
 
-		public CircleCollider(Transform trans, int radius, GameObject obj) : base(obj)
+		public CircleCollider(Transform trans, int radius, object obj) : base(obj)
 		{
 			Transform = trans;
 			Radius = radius;

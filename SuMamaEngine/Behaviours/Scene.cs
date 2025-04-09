@@ -8,12 +8,16 @@ namespace SuMamaEngine
 	public abstract class Scene : IDisposable
 	{
 		protected Dictionary<string, SceneLayer> _layers;
-		protected Dictionary<string, GameObject> _taggedObjs;
+		protected List<IUpdate> _updateables;
+
+		protected Dictionary<string, object> _taggedObjs;
+
 		protected WorldCollisor _world;
+
 		protected Camera _camera;
 
-		private Queue<GameObject> _poolForAdd;
-		private Queue<(bool, GameObject)> _poolForRemove;
+		private Queue<object> _poolForAdd;
+		private Queue<(bool, object)> _poolForRemove;
 
 		public string Id;
 
@@ -25,6 +29,7 @@ namespace SuMamaEngine
 		public Scene()
 		{
 			_layers = new Dictionary<string, SceneLayer>();
+			_updateables = new List<IUpdate>();
 			_taggedObjs = new();
 			_world = new();
 			_poolForAdd = new();
@@ -48,9 +53,9 @@ namespace SuMamaEngine
 		public virtual void Start()
 		{
 			if(Disposed) return;
-			foreach(var layer in _layers)
+			foreach(var obj in _updateables)
 			{
-				layer.Value.Start();
+				obj.Start();
 			}
 		}
 
@@ -58,9 +63,9 @@ namespace SuMamaEngine
 		{
 			if(Disposed) return;
 
-			foreach(var layer in _layers)
+			foreach(var obj in _updateables)
 			{
-				layer.Value.Update();
+				obj.Update();
 			}
 
 			_world.CheckCollisions();
@@ -73,20 +78,54 @@ namespace SuMamaEngine
 			while(_poolForAdd.Count > 0)
 			{
 				var obj = _poolForAdd.Dequeue();
-				if(string.IsNullOrEmpty(obj.Layer)) throw new ArgumentNullException("Scene.AddObject() obj.Layer is null or empty");
-				_layers[obj.Layer].Add(obj);
-				obj.Added();
-				obj.Start();
+				if(obj is IDraw)
+				{
+					var drawable = obj as IDraw;
+					if(string.IsNullOrEmpty(drawable.Layer)) throw new ArgumentNullException("Scene.AddObject() obj.Layer is null or empty");
+					_layers[drawable.Layer].Add(drawable);
+				}
+
+				if(obj is IUpdate)
+				{
+					var updateable = obj as IUpdate;
+					_updateables.Add(updateable);
+					updateable.Start();
+				}
+
+				if(obj is ISceneObject)
+				{
+					var sceneObject = obj as ISceneObject;
+					sceneObject.Added();
+				}
 			}
 
 			while(_poolForRemove.Count > 0)
 			{
 				var item = _poolForRemove.Dequeue();
-				_layers[item.Item2.Layer].Remove(item.Item2);
-				item.Item2.Removed();
-				if(item.Item1)
+				var disposable = item.Item1;
+				var obj = item.Item2;
+				if(obj is IDraw)
 				{
-					item.Item2.Dispose();
+					var drawable = obj as IDraw;
+					_layers[drawable.Layer].Remove(drawable);
+				}
+
+				if(obj is IUpdate)
+				{
+					var updateable = obj as IUpdate;
+					_updateables.Remove(updateable);
+				}
+
+				if(obj is ISceneObject)
+				{
+					var sceneObject = obj as ISceneObject;
+					sceneObject.Removed();
+				}
+
+				if(disposable)
+				{
+					var dis = obj as IDisposable;
+					dis.Dispose();
 				}
 			}
 		}
@@ -128,7 +167,7 @@ namespace SuMamaEngine
 			if(!_taggedObjs.ContainsKey(tag)) _taggedObjs.Add(tag, null);
 		}
 		
-		public void AddTag(string tag, GameObject obj)
+		public void AddTag(string tag, object obj)
 		{
 			if(obj == null) throw new ArgumentNullException("Scene.AddTag() obj is null");
 			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.AddTag() tag is null or empty");
@@ -143,7 +182,7 @@ namespace SuMamaEngine
 			if(_taggedObjs.ContainsKey(tag)) _taggedObjs.Remove(tag);
 		}
 
-		public GameObject GetObjectFromTag(string tag)
+		public object GetObjectFromTag(string tag)
 		{
 			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.GetObjectFromTag() tag is null or empty");
 
@@ -151,7 +190,7 @@ namespace SuMamaEngine
 			return null;
 		}
 
-		public void SetObjectInTag(string tag, GameObject obj)
+		public void SetObjectInTag(string tag, object obj)
 		{
 			if(obj == null) throw new ArgumentNullException("Scene.SetObjectInTag() obj is null");
 			if(String.IsNullOrEmpty(tag)) throw new ArgumentNullException("Scene.SetObjectInTag() tag is null or empty");
@@ -159,87 +198,123 @@ namespace SuMamaEngine
 			if(_taggedObjs.ContainsKey(tag)) _taggedObjs[tag] = obj;
 		}
 
-		// GameObject Handlers
+		// object Handlers
 
-		public void AddObject(string layer, GameObject e)
+		public void AddObject(object o)
+		{
+			if(o == null) throw new ArgumentNullException("Scene.AddObject() object is null");
+			_poolForAdd.Enqueue(o);
+		}
+
+		public void AddObject(object o, string layer)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.AddEnttiy() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
-			e.Layer = layer;
-			_poolForAdd.Enqueue(e);
+			if(o == null) throw new ArgumentNullException("Scene.AddObject() object is null");
+			_poolForAdd.Enqueue(o);
 		}
 
-		public void AddObject(GameObject e)
-		{
-			if(e == null) throw new ArgumentNullException("Scene.AddObject() GameObject is null");
-			_poolForAdd.Enqueue(e);
-		}
-
-		public void RemoveObject(string layer, GameObject e, bool disposable=false)
+		public void RemoveObject(object o, string layer, bool disposable=false)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.RemoveEnttiy() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
-			e.Layer = layer;
-			_poolForRemove.Enqueue((disposable, e));
+			if(o == null) throw new ArgumentNullException("Scene.RemoveObject() Object is null");
+			_poolForRemove.Enqueue((disposable, o));
 		}
 
-		public void RemoveObject(GameObject e, bool disposable=false)
+
+		public void RemoveObject(object o, bool disposable=false)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.RemoveObject() GameObject is null");
-			_poolForRemove.Enqueue((disposable, e));
+			if(o == null) throw new ArgumentNullException("Scene.RemoveObject() Object is null");
+			_poolForRemove.Enqueue((disposable, o));
 		}
 
-		public bool ContainsObject(GameObject e)
+		public bool ContainsObject(object o)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.ContainsObject() GameObject is null");
-			foreach(var layer in _layers)
+			if(o == null) throw new ArgumentNullException("Scene.ContainsObject() Object is null");
+			if(o is IUpdate)
 			{
-				if(layer.Value.Contains(e)) return true;
+				return _updateables.Contains((IUpdate) o);
 			}
 
 			return false;
 		}
 
-		public bool ContainsObject(string layer, GameObject e)
+		public bool ContainsObject(object o, string layer)
 		{
 			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.ContainsObject() layer is null or empty");
-			if(e == null) throw new ArgumentNullException("Scene.ContainsObject() GameObject is null");
+			if(o == null) throw new ArgumentNullException("Scene.ContainsObject() Object is null");
 
-			return _layers[layer].Contains(e);
+			if(o is IDraw)
+			{
+				return _layers[layer].Contains((IDraw) o);
+			}
+
+			return false;
 		}
 
-		public GameObject FindObject(GameObject e)
+		public object FindObject(object o)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.FindObject() GameObject is null");
+			if(o == null) throw new ArgumentNullException("Scene.FindObject() object is null");
 
-			foreach(var layer in _layers)
+			if(o is IUpdate)
 			{
-				GameObject en = layer.Value.Find(e);
-				if(en != null) return en;
+				return _updateables.Find(obj => obj.Equals(o));
 			}
 
 			return null;
 		}
 
-		public GameObject FindObject(string layer, GameObject e)
+		public object FindObject(object o, string layer)
 		{
-			if(e == null) throw new ArgumentNullException("Scene.FindObject() GameObject is null");	
-			return _layers[layer].Find(e);
+			if(string.IsNullOrEmpty(layer)) throw new ArgumentNullException("Scene.FindObject() layer is null or empty");
+			if(o == null) throw new ArgumentNullException("Scene.FindObject() object is null");	
+
+			if(o is IDraw)
+			{
+				return _layers[layer].Find((IDraw) o);
+			}
+
+			return null;
 		}
 
-		public List<GameObject> GetAllEntities(string layer)
+		public List<IDraw> GetAllEntitiesFromLayer(string layer)
 		{
 			return _layers[layer].GetAllEntities();
 		}
 
-		public T GetEntityType<T>(string layer) where T : GameObject
+		public T GetEntityTypeFromLayer<T>(string layer) where T : IDraw
 		{
 			return (T)_layers[layer].GetEntityType<T>();
 		}
 
-		public void ClearObjects()
+		public List<IUpdate> GetAllEntities()
+		{
+			return _updateables;
+		}
+
+		public T GetEntityType<T>() where T : IUpdate
+		{
+			return (T)_updateables.Find(obj => obj is T);
+		}
+
+		public void ClearObjectsFromLayers()
 		{
 			_layers.Clear();
+		}
+
+		public void ClearObjectsFromLayer(string layer)
+		{
+			_layers[layer].Clear();
+		}
+
+		public void ClearObjects()
+		{
+			_updateables.Clear();
+		}
+
+		public void Clear()
+		{
+			_layers.Clear();
+			_updateables.Clear();
 		}
 
 		public Camera GetCamera()
@@ -257,7 +332,7 @@ namespace SuMamaEngine
 			_camera = camera;
 		}
 
-		public RectCollider CreateRectCollider(Transform trans, int w, int h, GameObject obj=null, bool isDynamic=false)
+		public RectCollider CreateRectCollider(Transform trans, int w, int h, object obj=null, bool isDynamic=false)
 		{
 			RectCollider rect = new(trans, w, h, obj);
 			_world.AddCollider(rect, isDynamic);
@@ -265,7 +340,7 @@ namespace SuMamaEngine
 		}
 
 
-		public CircleCollider CreateCircleCollider(Transform trans, int radius, GameObject obj=null, bool isDynamic=false)
+		public CircleCollider CreateCircleCollider(Transform trans, int radius, object obj=null, bool isDynamic=false)
 		{
 			CircleCollider circle = new(trans, radius, obj);
 			_world.AddCollider(circle, isDynamic);

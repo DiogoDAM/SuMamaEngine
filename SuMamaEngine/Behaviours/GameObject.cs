@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace SuMamaEngine
 {
 	// The Base of all Objects in game
-	public class GameObject : IDisposable, IPrototype
+	public class GameObject : IDisposable, IPrototype, IUpdate, IDraw, ISceneObject
 	{
         public bool Disposed { get; protected set; }
 
@@ -17,7 +17,8 @@ namespace SuMamaEngine
 		public SpriteEffects Flip;
 
 		public string SceneId;
-		public string Layer;
+		public string Layer { get; protected set; }
+		public float DepthPoint { get; protected set; }
 		public string Id;
 
 		public GameObject()
@@ -61,7 +62,7 @@ namespace SuMamaEngine
 
 		public static void AddToScene(string layer, GameObject obj)
 		{
-			SceneManager.Instance.CurrentScene.AddObject(layer, obj);
+			SceneManager.Instance.CurrentScene.AddObject(obj, layer);
 		}
 
 		public static T Instantiate<T>(T original) where T : GameObject, new()
@@ -81,7 +82,7 @@ namespace SuMamaEngine
 
 			newInstance = (T) original.DeepClone();
 
-			SceneManager.Instance.CurrentScene.AddObject(layer, newInstance);
+			SceneManager.Instance.CurrentScene.AddObject(newInstance, layer);
 
 			return newInstance;
 		}
@@ -105,7 +106,7 @@ namespace SuMamaEngine
 			newInstance = (T) original.DeepClone();
 
 			newInstance.Transform.Position = pos;
-			SceneManager.Instance.CurrentScene.AddObject(layer, newInstance);
+			SceneManager.Instance.CurrentScene.AddObject(newInstance, layer);
 
 			return newInstance;
 		}
@@ -117,7 +118,7 @@ namespace SuMamaEngine
 
 		public static void RemoveOfScene(string layer, GameObject e)
 		{
-			SceneManager.Instance.CurrentScene.RemoveObject(layer, e);
+			SceneManager.Instance.CurrentScene.RemoveObject(e, layer);
 		}
 
 		public static void Destroy(GameObject e)
@@ -127,7 +128,7 @@ namespace SuMamaEngine
 
 		public static void Destroy(GameObject e, string layer)
 		{
-			SceneManager.Instance.CurrentScene.RemoveObject(layer, e, true);
+			SceneManager.Instance.CurrentScene.RemoveObject(e, layer, true);
 		}
 
 		// Methods for handle the Dispose

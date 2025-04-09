@@ -5,85 +5,69 @@ namespace SuMamaEngine
 {
 	public struct SceneLayer
 	{
-		private List<GameObject> _objs;
-		public int Count { get { return _objs.Count; } }
+		private List<IDraw> _items;
+		public int Count { get { return _items.Count; } }
 		public string Id;
 		public Scene Scene;
 
 		public SceneLayer(string layer, Scene scene)
 		{
-			_objs = new List<GameObject>();
+			_items = new List<IDraw>();
 			Id = layer;
 			Scene = scene;
 		}
 
-		public void Start()
-		{
-			foreach(var e in _objs)
-			{
-				e.Start();
-			}
-		}
-
-		public void Update()
-		{
-			foreach(var e in _objs)
-			{
-				e.Update();
-			}
-		}
-
 		public void Draw()
 		{
-			foreach(var e in _objs)
+			foreach(var e in _items)
 			{
 				e.Draw();
 			}
 		}
 
-		public void Add(GameObject obj)
+		public void Add(IDraw obj)
 		{
-			if(obj == null) throw new ArgumentNullException("EntityManager.Add() GameObject is null");
-			_objs.Add(obj);
+			if(obj == null) throw new ArgumentNullException("EntityManager.Add() IDraw is null");
+			_items.Add(obj);
 		}
 
-		public void Remove(GameObject obj)
+		public void Remove(IDraw obj)
 		{
-			if(obj == null) throw new ArgumentNullException("EntityManager.Remove() GameObject is null");
-			_objs.Remove(obj);
+			if(obj == null) throw new ArgumentNullException("EntityManager.Remove() IDraw is null");
+			_items.Remove(obj);
 		}
 		
-		public bool Contains(GameObject obj)
+		public bool Contains(IDraw obj)
 		{
-			if(obj == null) throw new ArgumentNullException("EntityManager.Contains() GameObject is null");
-			return _objs.Contains(obj);
+			if(obj == null) throw new ArgumentNullException("EntityManager.Contains() IDraw is null");
+			return _items.Contains(obj);
 		}
 
-		public GameObject Find(GameObject obj)
+		public IDraw Find(IDraw obj)
 		{
-			if(obj == null) throw new ArgumentNullException("EntityManager.Find() GameObject is null");
-			return _objs.Find((it) => it.Equals(obj));
+			if(obj == null) throw new ArgumentNullException("EntityManager.Find() IDraw is null");
+			return _items.Find((it) => it.Equals(obj));
 		}
 
-		public void Sort(Comparison<GameObject> con)
+		public void Sort(Comparison<IDraw> con)
 		{
-			_objs.Sort(con);
+			_items.Sort(con);
 		}
 
-		public T GetEntityType<T>() where T : GameObject
+		public T GetEntityType<T>() where T : IDraw
 		{
-			return (T)_objs.Find((e) => e is T);
+			return (T)_items.Find((e) => e is T);
 		}
 
 
-		public List<GameObject> GetAllEntities()
+		public List<IDraw> GetAllEntities()
 		{
-			return _objs;
+			return _items;
 		}
 
 		public void Clear()
 		{
-			_objs.Clear();
+			_items.Clear();
 		}
 	}
 }
