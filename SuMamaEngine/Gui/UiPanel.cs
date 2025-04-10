@@ -37,11 +37,11 @@ namespace SuMamaEngine
 		{
 			if(!Float)
 			{
-				Globals.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color.White, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color.White, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 			else
 			{
-				Globals.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color.White, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color.White, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 
 			base.Draw();

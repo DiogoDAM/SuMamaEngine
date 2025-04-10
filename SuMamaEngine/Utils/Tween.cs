@@ -29,7 +29,7 @@ namespace SuMamaEngine
 		{
 			if(!IsRunning) return;
 
-			_currentTime += Globals.DeltaTime;
+			_currentTime += Engine.DeltaTime;
 			_currentTime = Math.Min(_currentTime, _duration);
 
 			if(_currentTime >= _duration)

@@ -60,7 +60,7 @@ namespace SuMamaEngine
 						if(tile != 0)
 						{
 							Vector2 tilePos = new Vector2(Position.X + (column * TileWidth), Position.Y + (row * TileHeight));
-							Globals.SpriteBatch.Draw(Sprite.Texture,
+							Engine.SpriteBatch.Draw(Sprite.Texture,
 									tilePos,
 									Sprite.Quads[tile],
 									Color.White
@@ -90,7 +90,7 @@ namespace SuMamaEngine
 						if(tile != 0)
 						{
 							Vector2 tilePos = Utilities.CarToIsoScreen(column, row, TileWidth, TileHeight);
-							Globals.SpriteBatch.Draw(Sprite.Texture,
+							Engine.SpriteBatch.Draw(Sprite.Texture,
 									Position.ToVector2() + tilePos,
 									Sprite.Quads[tile],
 									Color.White

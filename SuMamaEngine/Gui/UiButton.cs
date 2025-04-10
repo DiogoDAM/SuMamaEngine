@@ -80,7 +80,7 @@ namespace SuMamaEngine
 		{
 			if(!Float)
 			{
-				Globals.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(Sprite.Texture, GlobalPosition, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 				if(_borderOn)
 				{
 					Drawer.DrawLineRectangle(Transform.GlobalPosition + BorderOffset, Width, Height, BorderColor, BorderThickness);
@@ -88,7 +88,7 @@ namespace SuMamaEngine
 			}
 			else
 			{
-				Globals.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(Sprite.Texture, Position, Sprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 				if(_borderOn)
 				{
 					Drawer.DrawLineRectangle(Position + BorderOffset, Width, Height, BorderColor, BorderThickness);

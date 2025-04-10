@@ -83,13 +83,13 @@ namespace SuMamaEngine
 		{
 			if(!Float)
 			{
-				Globals.SpriteBatch.Draw(BackgroundSprite.Texture, GlobalPosition, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
-				Globals.SpriteBatch.Draw(BarSprite.Texture, GlobalPosition, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(BackgroundSprite.Texture, GlobalPosition, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(BarSprite.Texture, GlobalPosition, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 			else
 			{
-				Globals.SpriteBatch.Draw(BackgroundSprite.Texture, Position, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
-				Globals.SpriteBatch.Draw(BarSprite.Texture, Position, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(BackgroundSprite.Texture, Position, BackgroundSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
+				Engine.SpriteBatch.Draw(BarSprite.Texture, Position, BarSprite.Bounds, Color, Transform.Rotation, Origin, Transform.Scale, Flip, Depth);
 			}
 
 			base.Draw();

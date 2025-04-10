@@ -18,7 +18,7 @@ namespace SuMamaEngine
 
 		public static void DrawStraightLine(Vector2 pos, int length, Color color, int thicknes=1)
 		{
-			Globals.SpriteBatch.Draw(_pixelTexture, new Rectangle((int)pos.X, (int)pos.Y, length, thicknes), color);
+			Engine.SpriteBatch.Draw(_pixelTexture, new Rectangle((int)pos.X, (int)pos.Y, length, thicknes), color);
 		}
 
 		public static void DrawLine(Vector2 start, Vector2 end, Color color, int thicknes=1, float depth=1f)
@@ -26,7 +26,7 @@ namespace SuMamaEngine
 			float distance = Vector2.Distance(start, end);
 			float angle = (float)Math.Atan2(end.Y - start.Y, end.X - start.X);
 
-			Globals.SpriteBatch.Draw(_pixelTexture, start, null, color, angle, Vector2.Zero, new Vector2(distance, thicknes), SpriteEffects.None, depth);
+			Engine.SpriteBatch.Draw(_pixelTexture, start, null, color, angle, Vector2.Zero, new Vector2(distance, thicknes), SpriteEffects.None, depth);
 		}
 
 		public static void DrawLineRectangle(Vector2 pos, int w, int h, Color color, int thicknes=1, float depth=1f)
@@ -57,7 +57,7 @@ namespace SuMamaEngine
 
 		public static void DrawFillRectangle(Vector2 pos, int w, int h, Color color, float rot=0f, float depth=1f)
 		{
-			Globals.SpriteBatch.Draw(_pixelTexture, pos, null, color, rot, Vector2.Zero, new Vector2(w,h), SpriteEffects.None, depth);
+			Engine.SpriteBatch.Draw(_pixelTexture, pos, null, color, rot, Vector2.Zero, new Vector2(w,h), SpriteEffects.None, depth);
 		}
 
 		public static Texture2D CreateFillRectangle(int w, int h, Color color, float depth=1f)
@@ -80,7 +80,7 @@ namespace SuMamaEngine
 
 		public static void DrawFillRectangle(Rectangle rect, Color color, float rot=0f, float depth=1f)
 		{
-			Globals.SpriteBatch.Draw(_pixelTexture, rect, null, color, rot, Vector2.Zero, SpriteEffects.None, depth);
+			Engine.SpriteBatch.Draw(_pixelTexture, rect, null, color, rot, Vector2.Zero, SpriteEffects.None, depth);
 		}
 
 		public static void DrawLinePolygon(Vector2[] vertices, Color color, int thicknes=1, float depth=1f)
@@ -157,7 +157,7 @@ namespace SuMamaEngine
 
 			texCircle.SetData(data);
 
-			Globals.SpriteBatch.Draw(texCircle, pos, color);
+			Engine.SpriteBatch.Draw(texCircle, pos, color);
 		}
 	}
 }

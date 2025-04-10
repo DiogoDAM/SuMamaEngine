@@ -20,7 +20,7 @@ namespace SuMamaEngine
 
 		public virtual void Update()
 		{
-			_currentTime += Globals.DeltaTime;
+			_currentTime += Engine.DeltaTime;
 
 			if(_currentTime >= _duration)
 			{

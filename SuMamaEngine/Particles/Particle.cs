@@ -47,7 +47,7 @@ namespace SuMamaEngine
 
 		public void Update()
 		{
-			LifeTimeLeft -= Globals.DeltaTime;
+			LifeTimeLeft -= Engine.DeltaTime;
 
 			_amount = (float) LifeTimeLeft * 1f / LifeTime;
 
@@ -58,13 +58,13 @@ namespace SuMamaEngine
 			_angle = MathHelper.ToRadians(MathHelper.Lerp(Data.EndAngle, Data.StartAngle, _amount));
 			_rot = MathHelper.Lerp(Data.EndRotation, Data.StartRotation, _amount);
 			_dir = new Vector2((float)Math.Cos(_angle), (float)Math.Sin(_angle));
-			_pos += _dir * _speed * Globals.DeltaTime;
+			_pos += _dir * _speed * Engine.DeltaTime;
 
 		}
 
 		public void Draw()
 		{
-			Globals.SpriteBatch.Draw(_sprite.Texture, _pos, _sprite.Bounds, _color * _opacity, _rot, _anchor, _scale, SpriteEffects.None, _depth);
+			Engine.SpriteBatch.Draw(_sprite.Texture, _pos, _sprite.Bounds, _color * _opacity, _rot, _anchor, _scale, SpriteEffects.None, _depth);
 		}
 
 		public void Dispose()

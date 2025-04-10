@@ -43,11 +43,11 @@ namespace SuMamaEngine
 		{
 			if(!Float)
 			{
-				Globals.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, GlobalPosition, Color, Transform.Rotation, Spacing, Transform.Scale, SpriteText.Flip, 1f);
+				Engine.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, GlobalPosition, Color, Transform.Rotation, Spacing, Transform.Scale, SpriteText.Flip, 1f);
 			}
 			else
 			{
-				Globals.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, Position, Color);
+				Engine.SpriteBatch.DrawString(SpriteText.Font.SpriteFont, SpriteText.Text, Position, Color);
 			}
 
 			base.Draw();

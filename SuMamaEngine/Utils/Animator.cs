@@ -26,46 +26,58 @@ namespace SuMamaEngine
 
 		public void RemoveAnimation(string name)
 		{
+			if(_animations.ContainsKey(name)) _animations.Remove(name);
 		}
 
 		public bool ContainsAnimation(string name)
 		{
+			return _animations.ContainsKey(name);
 		}
 
 		public void ClearAnimation()
 		{
+			_animations.Clear();
 		}
 
 		public void Update()
 		{
+			_currentAnimation.Update();
 		}
 
 		public void Play(string name)
 		{
+			if(!_animations.ContainsKey(name)) throw new Exception($"Animator.Play() of the {ObjectId} don't have the {name} animation");
+			_currentAnimation = _animations[name];
 		}
 
 		public void Resume()
 		{
+			_currentAnimation.Resume();
 		}
 
 		public void Stop()
 		{
+			_currentAnimation.Stop();
 		}
 
 		public void Restart()
 		{
+			_currentAnimation.Restart();
 		}
 
 		public Animation GetCurrentAnimation()
 		{
+			return _currentAnimation;
 		}
 
 		public AnimationFrame GetFrame()
 		{
+			return _currentAnimation.CurrentFrame;
 		}
 
 		public Rectangle GetFrameBounds()
 		{
+			return _currentAnimation.CurrentFrame.Bounds;
 		}
 
 	}

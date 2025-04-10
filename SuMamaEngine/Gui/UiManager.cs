@@ -10,8 +10,8 @@ namespace SuMamaEngine
 
 		public UiManager() : base()
 		{
-			Width = Globals.WindowWidth;
-			Height = Globals.WindowHeight;
+			Width = Engine.WindowWidth;
+			Height = Engine.WindowHeight;
 		}
 
 		public bool CursorCrossesAnElement()

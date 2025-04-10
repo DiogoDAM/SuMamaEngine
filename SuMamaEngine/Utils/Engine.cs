@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace SuMamaEngine
 {
-	public static class Globals
+	public static class Engine
 	{
 		public static SpriteBatch SpriteBatch { get; private set; }
-		public static ContentManager Content { get; private set; }
+		public static AssetsManager Assets { get; private set; }
 		public static float DeltaTime { get; private set; }
 		public static float Fps { get; private set; }
 		public static float FrameCount { get; private set; }
@@ -22,7 +22,7 @@ namespace SuMamaEngine
 		{
 			SpriteBatch = new SpriteBatch(graphicsDevice);
 			_graphics = graphics;
-			Content = content;
+			Assets = new(content);
 			Drawer.Initialize(graphicsDevice);
 		}
 

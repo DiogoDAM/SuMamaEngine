@@ -19,7 +19,7 @@ namespace SuMamaEngine
 
 		public void Update()
 		{
-			_intervalLeft -= Globals.DeltaTime;
+			_intervalLeft -= Engine.DeltaTime;
 			while(_intervalLeft <= 0f)
 			{
 				_intervalLeft += _data.Interval;

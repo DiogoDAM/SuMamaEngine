@@ -80,7 +80,7 @@ namespace SuMamaEngine
 		{
 			if(State == AnimationState.Running)
 			{
-				_currentFrameTime += Globals.DeltaTime;
+				_currentFrameTime += Engine.DeltaTime;
 
 				if(_currentFrameTime >= CurrentFrame.Duration)
 				{
