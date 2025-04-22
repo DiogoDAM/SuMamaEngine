@@ -11,28 +11,42 @@ namespace SuMamaEngine
 		public Vector2 Scale { get { return Transform.Scale; } set { Transform.Scale = value; } }
 		public float Rotation { get { return Transform.Rotation; } set { Transform.Rotation = value; } }
 
+		public Viewport Viewport;
+
 		public bool Disposed { get; private set; }
 
 		public Camera()
 		{
 			Transform = new Transform(Vector2.Zero);
+			ViewPort = new Viewport(0,0);
 		}
 
-		public Camera(Transform trans)
+		public Camera(Transform trans, int width, int height)
 		{
 			Transform = trans;
+			Viewport = new(width, height);
 		}
 
-		public Camera(Vector2 pos)
+		public Camera(Vector2 pos, int width, int height)
 		{
 			Transform = new Transform(pos);
+			Viewport = new(width, height);
 		}
 
 		public Matrix GetMatrix()
 		{
-			return Matrix.CreateScale(Scale.X, Scale.Y, 1f) *
+			return Matrix.CreateTranslation(-Position.X, -Position.Y, 0f) *
 				Matrix.CreateRotationZ(Rotation) *
-				Matrix.CreateTranslation(-Position.X, -Position.Y, 0f);
+				Matrix.CreateScale(Scale.X, Scale.Y, 1f) *
+				Matrix.CreateTranslation(Viewport.Width , Viewport.Height, 0f);
+		}
+
+		public Matrix GetMatrixOnCenter()
+		{
+			return Matrix.CreateTranslation(-Position.X, -Position.Y, 0f) *
+				Matrix.CreateRotationZ(Rotation) *
+				Matrix.CreateScale(Scale.X, Scale.Y, 1f) *
+				Matrix.CreateTranslation(Viewport.Width * .5f , Viewport.Height * .5f, 0f);
 		}
 
 		public void Dispose()
