@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SuMamaEngine
 {
@@ -18,19 +19,23 @@ namespace SuMamaEngine
 		public Camera()
 		{
 			Transform = new Transform(Vector2.Zero);
-			ViewPort = new Viewport(0,0);
+			Viewport = new();
 		}
 
 		public Camera(Transform trans, int width, int height)
 		{
 			Transform = trans;
-			Viewport = new(width, height);
+			Viewport = new();
+			Viewport.Widt = width;
+			Viewport.Height = height;
 		}
 
 		public Camera(Vector2 pos, int width, int height)
 		{
 			Transform = new Transform(pos);
-			Viewport = new(width, height);
+			Viewport = new();
+			Viewport.Widt = width;
+			Viewport.Height = height;
 		}
 
 		public Matrix GetMatrix()
